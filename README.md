@@ -12,7 +12,7 @@ The agile extractor is composed of several different components. Fetchers gather
 
 #### Fetchers
 
-Fetchers are responsible for get raw data about tickets from agile data sources.
+Fetchers are responsible for getting raw data about tickets from agile data sources (JIRA, Trello, etc.)
 
 They depend on fetcher specific configuration including things like API end points, credentials and search criteria.
 
@@ -20,13 +20,13 @@ They produce a set of AgileTicket objects with a known interface.
 
 #### Analyzers
 
-Analyzers take in a set of AgileTicket objects and a AnalysisConfig and return a set of AnalyzedTicket objects that contain the original AgileTicket as well as additional data calculated in light of the analysis context.
+Analyzers take in a set of AgileTicket objects and an analysis configuration and return a set of AnalyzedTicket objects that contain the original AgileTicket as well as additional data calculated in light of the analysis context.
 
-For example, a CycleTime analyzer would look for a start_date and an end_state in the AnalysisContext, and calculate the days between those and store it as cycle_time on the AnalyzedTicket object.
+For example, a CycleTime analyzer would look for a start_state and an end_state in the configuration, and calculate the days between those and store it as cycle_time on the AnalyzedTicket object.
 
 #### Reporters
 
-Reporters take in a set of AnalyzedTicket objects a ReportConfig and return a Report object. It has two standard attributes:
+Reporters take in a set of AnalyzedTicket objects and a report configuration and return a Report object. It has two standard attributes:
 * Table - A representation of the report as a 2 dimensional table, provides column headers, row labels, and values for each row/column combo
 * Summary - A key/value store of report specific data
 
@@ -35,5 +35,5 @@ Reporters take in a set of AnalyzedTicket objects a ReportConfig and return a Re
 Writers take in a Report and a WriterConfig can write it out a particular source. Examples:
 * CSV to standout
 * CSV to a file
-* GoogleSpreadsheet
+* Google spreadsheet
 * Plotly
