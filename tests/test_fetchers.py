@@ -1,5 +1,6 @@
 import pytest
 
+
 @pytest.fixture
 def klass():
     from jira_agile_extractor.fetchers import JIRAFetcher
@@ -13,11 +14,12 @@ def test_required_config(klass):
     )
     assert f
 
-@pytest.mark.parametrize("args,exc",[
+
+@pytest.mark.parametrize("args,exc", [
     ((), TypeError),
     ((dict()), TypeError),
     ((dict(), None), TypeError),
 ])
 def test_missing_config(klass, args, exc):
     with pytest.raises(exc):
-        f = klass(*args)
+        klass(*args)

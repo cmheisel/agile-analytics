@@ -6,7 +6,7 @@ reqs: venv
 
 test: reqs
 	./venv/bin/python setup.py develop
-	./venv/bin/py.test
+	./venv/bin/py.test --flakes --pep8
 
 clean:
 	rm -rf venv
