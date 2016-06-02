@@ -37,3 +37,38 @@ Writers take in a Report and a WriterConfig can write it out a particular source
 * CSV to a file
 * Google spreadsheet
 * Plotly
+
+### Diagram
+
+```
+                                                            +----------->  Reporter: Distribution
+                                                            |                title=Cycle Time Distribution
+                                                            |                start_date=1/1/2015
+                                                            |                end_date=3/31/2015
+                                                            |                field=cycle_time
+                                                            |
+                                                            +----------->  Reporter: Throughput
+                                                            |                title=Weekly Throughput
+                                                            |                start_date=1/1/2015
+                                                            |                end_date=3/31/2015
+                                                            |                period=weekly
+                                                            |
+                                                            |
+                                                            |
+                 +----------------->  Analyzer: Cycle Time  +
+                 |                      start_state=Backlog
+                 |                      end_state=Deployed
+                 |                      issue_types=Story
+                 |
+Fetcher          |                                          +-----------> Reporter: Throughput
+  source=JIRA    +---------------->  Analyzer: Defect       +               title=Escaped Defects
+  filter=1111    |                     defect_types=Bug,Incident            start_date=1/1/2015
+  auth=user,pass |                                                          end_date=3/31/2015
+                 |
+                 |
+                 +---------------->  Analyzer: Cycle Time   +-----------> Reporter: Throughput
+                                       start_state=Analysis                 title=Weekly Analysis Throughput
+                                       end_state=Dev                        start_date=1/1/2015
+                                                                            end_date=3/31/2015
+                                                                            period=weekly
+```
