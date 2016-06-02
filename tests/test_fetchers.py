@@ -12,3 +12,12 @@ def test_required_config(klass):
         filter_id=9999
     )
     assert f
+
+@pytest.mark.parametrize("args,exc",[
+    ((), TypeError),
+    ((dict()), TypeError),
+    ((dict(), None), TypeError),
+])
+def test_missing_config(klass, args, exc):
+    with pytest.raises(exc):
+        f = klass(*args)
