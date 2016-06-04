@@ -3,7 +3,12 @@ Shitty docstring
 """
 
 from .fetchers import (
-    JIRAFetcher
+    JIRAFetcher,
+    convert_jira_issue
+)
+
+from .models import (
+    AgileTicket,
 )
 
 __author__ = 'cmheisel'
