@@ -1,4 +1,11 @@
-
+#jira
+jira==1.0.3
+oauthlib==1.1.2
+requests==2.10.0
+requests-oauthlib==0.6.1
+requests-toolbelt==0.6.2
+six==1.10.0
+tlslite==0.4.9
 
 #Testing
 py==1.4.31

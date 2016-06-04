@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 from setuptools import setup, find_packages
 
-from jira_agile_extractor import jira_agile_extractor
+import jira_agile_extractor
 
 
 README = file('README.md', 'r').read()
