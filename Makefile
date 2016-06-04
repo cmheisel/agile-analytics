@@ -8,7 +8,9 @@ jira_agile_extractor.egg-info: reqs
 	./venv/bin/python setup.py develop
 
 test: jira_agile_extractor.egg-info
-	./venv/bin/py.test --flakes --pep8
+	./venv/bin/py.test -s --flakes --pep8
+	# Poor man's system test, not committed because it requies a real jira
+	[ -f tryout.py ] && ./venv/bin/python tryout.py
 
 clean_pycs:
 	find . -name "*.pyc" -exec rm -rf {} \;
