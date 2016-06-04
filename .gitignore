@@ -2,6 +2,9 @@
 tryout.py
 tests/json/*.json
 
+# Build artifacts
+reqs
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
