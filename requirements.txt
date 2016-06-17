@@ -8,16 +8,15 @@ six==1.10.0
 tlslite==0.4.9
 
 #dateutil
-python==dateutil-2.5.3
+python-dateutil==2.5.3
 
 #Testing
+flake8==2.6.0
+mccabe==0.5.0
 py==1.4.31
-pytest==2.9.2
-apipkg==1.4
-execnet==1.4.1
+pycodestyle==2.0.0
 pyflakes==1.2.3
-pytest-cache==1.0
-pytest-flakes==1.0.1
-pep8==1.7.0
-pytest-pep8==1.0.6
+pytest==2.9.2
+pytest-flake8==0.5
+
 pretend==1.0.8
