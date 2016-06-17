@@ -1,7 +1,4 @@
-"""
-test_fetchers
-Tests the bundled fetchers and convers.
-"""
+"""Tests the bundled fetchers and converters."""
 
 from datetime import datetime
 
@@ -12,25 +9,29 @@ from pretend import stub
 
 @pytest.fixture
 def tz():
+    """Return a timezone."""
     from dateutil.tz import tzutc
     return tzutc()
 
 
 @pytest.fixture
 def klass():
+    """Return the Class Under Test."""
     from jira_agile_extractor.fetchers import JIRAFetcher
     return JIRAFetcher
 
 
 @pytest.fixture
 def converter():
+    """Return the Function Under Test."""
     from jira_agile_extractor.fetchers import convert_jira_issue
     return convert_jira_issue
 
 
 @pytest.fixture
 def jira_issue():
-    """
+    """Mock jira issue.
+
     Alternate way to get a JIRA issue mock
     ========================================
     from jira import JIRA
@@ -46,7 +47,6 @@ def jira_issue():
     i = Issue(options=None, session=None, raw=js)
     return i
     """
-
     fields = stub(
         issuetype=stub(
             name="Story"
@@ -104,6 +104,7 @@ def jira_issue():
 
 
 def test_required_config(klass):
+    """Test the required class instantiation values."""
     f = klass(
         url="https://jira.example.local",
         auth=dict(username="foo", password="bar"),
@@ -118,11 +119,13 @@ def test_required_config(klass):
     ((dict(), None), TypeError),
 ])
 def test_missing_config(klass, args, exc):
+    """Test what happens when the config is missing."""
     with pytest.raises(exc):
         klass(*args)
 
 
 def test_basic_auth_kwargs(klass):
+    """Ensure basic_auth kwargs are handeled."""
     basic_auth = dict(username="foo", password="bar")
     f = klass(
         url="https://jira.example.local",
@@ -134,6 +137,7 @@ def test_basic_auth_kwargs(klass):
 
 
 def test_oauth_kwargs(klass):
+    """Ensure oauth kwargs are handled."""
     oauth = dict(
         access_token="foo",
         access_token_secret="bar",
@@ -150,6 +154,7 @@ def test_oauth_kwargs(klass):
 
 
 def test_extra_kwargs(klass):
+    """Ensure extra_kwargs work."""
     basic_auth = dict(username="foo", password="bar")
     extra_kwargs = dict(options=dict(verify=False))
     f = klass(
@@ -163,21 +168,25 @@ def test_extra_kwargs(klass):
 
 
 def test_converter_key(jira_issue, converter):
+    """Ensure a converted issue has a key."""
     t = converter(jira_issue)
     assert t.key == u"FOO-1"
 
 
 def test_converter_created_at(jira_issue, converter, tz):
+    """Ensure created_at is populated."""
     t = converter(jira_issue)
     assert t.created_at == datetime(2016, 03, 30, 17, 27, 9, tzinfo=tz)
 
 
 def test_converter_updated_at(jira_issue, converter, tz):
+    """Ensure updated_at is populated."""
     t = converter(jira_issue)
     assert t.updated_at == datetime(2016, 05, 18, 16, 17, 21, tzinfo=tz)
 
 
 def test_changelog_conversion(jira_issue, converter, tz):
+    """Ensure the changelog is converted as expected."""
     expected = [
         dict(
             entered_at=datetime(2016, 03, 30, 17, 27, 9, tzinfo=tz),
