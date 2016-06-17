@@ -1,6 +1,7 @@
 # jira-agile-extractor
 
 [![Build Status](https://travis-ci.org/cmheisel/agile-analytics.svg?branch=master)](https://travis-ci.org/cmheisel/agile-analytics)
+[![Coverage Status](https://coveralls.io/repos/github/cmheisel/agile-analytics/badge.svg?branch=master)](https://coveralls.io/github/cmheisel/agile-analytics?branch=master)
 [![Stories in Ready](https://badge.waffle.io/cmheisel/jira-agile-extractor.svg?label=ready&title=Ready)](http://waffle.io/cmheisel/jira-agile-extractor)
 
 Extract data about items from JIRA, output raw data and interesting reports
