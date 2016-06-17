@@ -27,7 +27,7 @@ def convert_jira_issue(issue):
     Convert a JIRA issue into a AgileTicket.
 
     Args:
-        issue: A jira.Issue instance
+        issue (Issue): A jira.Issue instance
 
     Returns:
         An AgileTicket instance

@@ -1,8 +1,23 @@
+"""Data models."""
+
 from datetime import datetime
 
 
 class AgileTicket(object):
+    """Abstract representation of tickets in Agile systems.
+
+    Attributes:
+        key (unicode): Unique identifier for the ticket in its system of record
+        created_at (datetime): When was the ticket created
+        updated_at (datetime): When was the ticket last updated
+    """
+
     def __init__(self, key):
+        """Init an AgileTicket.
+
+        Args:
+            key (str): A unique identifier for this ticket in the system of record
+        """
         self.key = unicode(key)
         self.created_at = None
         self.updated_at = None
@@ -10,11 +25,30 @@ class AgileTicket(object):
 
     @property
     def flow_log(self):
+        """FlowLog[dict].
+
+        A list of dicts guaranteed to have the following:
+            entered_at (datetime): When the ticket entered the state
+            state (unicode): The name of the state the ticket entered
+        """
         return self._flow_log
 
 
 class FlowLog(list):
+    """List subclass enforcing dictionaries with specific keys are added to it."""
+
     def append(self, value):
+        """Add items to the list.
+
+        Args:
+            value (dict): Must contain an entered_at and state key.
+
+        Returns:
+            None
+
+        Raises:
+            TypeError: Flow log items must have a 'entered_at' datetime and a 'state' string.
+        """
         try:
             ('entered_at', 'state') in value.keys()
         except AttributeError:
