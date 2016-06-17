@@ -63,7 +63,8 @@ class JIRAFetcher(BaseFetcher):
     """Fetch data from JIRA and transform it into AgileTickets.
 
     Attributes:
-        None
+        jira_kwargs (dict): The arguments passed to the JIRA instance.
+        auth_kwargs (dict): The authentication kwargs passed to the JIRA instance
     """
 
     BASIC_AUTH_KEYS = ['username', 'password']
@@ -89,20 +90,20 @@ class JIRAFetcher(BaseFetcher):
         """
         self._url = url
         self._auth = auth
-        self._auth_kwargs = {}
+        self.auth_kwargs = {}
         self._validate_auth()
         self._filter_id = int(filter_id)
-        self._jira_kwargs = jira_kwargs or {}
-        self._jira_kwargs.update(self.auth_kwargs)
+        self.jira_kwargs = jira_kwargs or {}
+        self.jira_kwargs.update(self.auth_kwargs)
         self._max_results = max_results
 
     def _validate_auth(self):
         if set(self._auth.keys()) <= set(self.BASIC_AUTH_KEYS) and set(self._auth.keys()) <= set(self.OAUTH_KEYS):
             raise TypeError("Neither %s nor %s found in auth parameter" % (self.BASIC_AUTH_KEYS, self.OAUTH_KEYS))
         if set(self._auth.keys()) <= set(self.BASIC_AUTH_KEYS):
-            self._auth_kwargs = dict(basic_auth=(self._auth['username'], self._auth['password']))
+            self.auth_kwargs = dict(basic_auth=(self._auth['username'], self._auth['password']))
         elif set(self._auth.keys()) <= set(self.OAUTH_KEYS):
-            self._auth_kwargs = dict(oauth=self.auth)
+            self.auth_kwargs = dict(oauth=self._auth)
         else:
             raise TypeError("Neither %s nor %s found in auth parameter" % (self.BASIC_AUTH_KEYS, self.OAUTH_KEYS))
 
@@ -119,11 +120,11 @@ class JIRAFetcher(BaseFetcher):
             None
         """
         j = jira_klass(
-            server=self.url,
+            server=self._url,
             **self.jira_kwargs
         )
-        search_string = "filter={filter_id}".format(filter_id=self.filter_id)
-        issues = j.search_issues(search_string, maxResults=self.max_results, expand="changelog")
+        search_string = "filter={filter_id}".format(filter_id=self._filter_id)
+        issues = j.search_issues(search_string, maxResults=self._max_results, expand="changelog")
         tickets = []
         for i in issues:
             tickets.append(convert_jira_issue(i))
