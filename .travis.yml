@@ -2,4 +2,4 @@ language: python
 python:
   - "2.7"
 install: "make agile_analytics.egg-info"
-command: "make test"
+script: "make test"
