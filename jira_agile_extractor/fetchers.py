@@ -1,4 +1,7 @@
+from dateutil.parser import parse
 from jira import JIRA
+
+from models import AgileTicket
 
 
 class BaseFetcher(object):
@@ -11,7 +14,28 @@ def convert_jira_issue(issue):
     Accepts a jira.Issue object and returns a jira_agile_extractor.AgileTicket
     :issue: jira.Issue
     """
-    pass
+    t = AgileTicket(issue.key)
+
+    t.created_at = parse(issue.fields.created)
+    t.updated_at = parse(issue.fields.updated)
+    t.flow_log.append(
+        dict(
+            entered_at=t.created_at,
+            state=unicode("Created"),
+        )
+    )
+
+    for history in issue.changelog.histories:
+        for item in history.items:
+            if item.field == 'status':
+                t.flow_log.append(
+                    dict(
+                        entered_at=parse(history.created),
+                        state=unicode(item.toString)
+                    )
+                )
+
+    return t
 
 
 class JIRAFetcher(BaseFetcher):

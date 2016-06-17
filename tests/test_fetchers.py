@@ -1,12 +1,31 @@
+"""
+test_fetchers
+Tests the bundled fetchers and convers.
+"""
+
+from datetime import datetime
+
 import pytest
 
 from pretend import stub
 
 
 @pytest.fixture
+def tz():
+    from dateutil.tz import tzutc
+    return tzutc()
+
+
+@pytest.fixture
 def klass():
     from jira_agile_extractor.fetchers import JIRAFetcher
     return JIRAFetcher
+
+
+@pytest.fixture
+def converter():
+    from jira_agile_extractor.fetchers import convert_jira_issue
+    return convert_jira_issue
 
 
 @pytest.fixture
@@ -31,7 +50,9 @@ def jira_issue():
     fields = stub(
         issuetype=stub(
             name="Story"
-        )
+        ),
+        created="2016-03-30T17:27:09.000+0000",
+        updated="2016-05-18T16:17:21.000+0000",
     )
 
     histories = [
@@ -141,10 +162,54 @@ def test_extra_kwargs(klass):
         assert f.jira_kwargs[key] == value
 
 
-def test_conversion(jira_issue):
-    # TODO: Actually make this a test
+def test_converter_key(jira_issue, converter):
+    t = converter(jira_issue)
+    assert t.key == u"FOO-1"
+
+
+def test_converter_created_at(jira_issue, converter, tz):
+    t = converter(jira_issue)
+    assert t.created_at == datetime(2016, 03, 30, 17, 27, 9, tzinfo=tz)
+
+
+def test_converter_updated_at(jira_issue, converter, tz):
+    t = converter(jira_issue)
+    assert t.updated_at == datetime(2016, 05, 18, 16, 17, 21, tzinfo=tz)
+
+
+def test_changelog_conversion(jira_issue, converter, tz):
+    expected = [
+        dict(
+            entered_at=datetime(2016, 03, 30, 17, 27, 9, tzinfo=tz),
+            state=u"Created"
+        ),
+        dict(
+            entered_at=datetime(2016, 4, 27, 14, 21, 23, tzinfo=tz),
+            state=u"In Progress"
+        ),
+        dict(
+            entered_at=datetime(2016, 04, 27, 14, 21, 24, tzinfo=tz),
+            state=u"BLOCKED",
+        ),
+        dict(
+            entered_at=datetime(2016, 05, 02, 14, 48, 32, tzinfo=tz),
+            state=u"In Progress",
+        ),
+        dict(
+            entered_at=datetime(2016, 05, 03, 18, 01, 10, tzinfo=tz),
+            state=u"In QA",
+        ),
+        dict(
+            entered_at=datetime(2016, 05, 05, 18, 42, 25, tzinfo=tz),
+            state=u"Done",
+        ),
+        dict(
+            entered_at=datetime(2016, 05, 18, 16, 17, 21, tzinfo=tz),
+            state=u"Accepted",
+        )
+    ]
+
     i = jira_issue
-    for history in i.changelog.histories:
-        for item in history.items:
-            if item.field == 'status':
-                print 'Date:' + history.created + ' From:' + item.fromString + ' To:' + item.toString
+    t = converter(i)
+
+    assert t.flow_log == expected
