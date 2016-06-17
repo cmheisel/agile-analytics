@@ -3,16 +3,16 @@
 from __future__ import unicode_literals
 from setuptools import setup, find_packages
 
-import jira_agile_extractor
+import agile_analytics
 
 
 README = file('README.md', 'r').read()
-version = ".".join(map(str, jira_agile_extractor.__version__))
-author = jira_agile_extractor.__author__
-description = jira_agile_extractor.__doc__
+version = ".".join(map(str, agile_analytics.__version__))
+author = agile_analytics.__author__
+description = agile_analytics.__doc__
 
 setup(
-    name='jira-agile-extractor',
+    name='agile-analytics',
     version=version,
     description=description,
     long_description=README,
@@ -29,7 +29,7 @@ setup(
     keywords='jira agile lean kanban metrics',
     author=author,
     author_email='chris@heisel.org',
-    url='http://github.com/joke2k/django-environ',
+    url='https://github.com/cmheisel/agile-analytics',
     license='MIT License',
     packages=find_packages(),
     include_package_data=True,

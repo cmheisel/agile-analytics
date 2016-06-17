@@ -3,7 +3,7 @@
 from dateutil.parser import parse
 from jira import JIRA
 
-from models import AgileTicket
+from .models import AgileTicket
 
 
 class BaseFetcher(object):

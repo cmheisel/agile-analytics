@@ -17,14 +17,14 @@ def tz():
 @pytest.fixture
 def klass():
     """Return the Class Under Test."""
-    from jira_agile_extractor.fetchers import JIRAFetcher
+    from agile_analytics.fetchers import JIRAFetcher
     return JIRAFetcher
 
 
 @pytest.fixture
 def converter():
     """Return the Function Under Test."""
-    from jira_agile_extractor.fetchers import convert_jira_issue
+    from agile_analytics.fetchers import convert_jira_issue
     return convert_jira_issue
 
 

@@ -3,7 +3,7 @@ import pytest
 
 @pytest.fixture
 def klass():
-    from jira_agile_extractor import AgileTicket
+    from agile_analytics import AgileTicket
     return AgileTicket
 
 
