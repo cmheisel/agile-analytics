@@ -7,6 +7,9 @@ requests-toolbelt==0.6.2
 six==1.10.0
 tlslite==0.4.9
 
+#dateutil
+python==dateutil-2.5.3
+
 #Testing
 py==1.4.31
 pytest==2.9.2
