@@ -19,5 +19,7 @@ clean: clean_pycs
 	rm -rf venv
 	rm -rf jira_agile_extractor.egg-info
 
+docs: reqs
+	cd docs && make html
 
-.PHONY: test clean clean_pycs
+.PHONY: test clean clean_pycs docs
