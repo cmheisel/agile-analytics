@@ -98,8 +98,6 @@ class JIRAFetcher(BaseFetcher):
         self._max_results = max_results
 
     def _validate_auth(self):
-        if set(self._auth.keys()) <= set(self.BASIC_AUTH_KEYS) and set(self._auth.keys()) <= set(self.OAUTH_KEYS):
-            raise TypeError("Neither %s nor %s found in auth parameter" % (self.BASIC_AUTH_KEYS, self.OAUTH_KEYS))
         if set(self._auth.keys()) <= set(self.BASIC_AUTH_KEYS):
             self.auth_kwargs = dict(basic_auth=(self._auth['username'], self._auth['password']))
         elif set(self._auth.keys()) <= set(self.OAUTH_KEYS):
