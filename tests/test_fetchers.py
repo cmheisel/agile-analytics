@@ -136,6 +136,17 @@ def test_missing_config(klass, args, exc):
         klass(*args)
 
 
+def test_weird_auth(klass):
+    """Ensure we get a TypeError if the auth contains neither key."""
+    auth = dict(random="bar", token_up="buuuuddddy")
+    with pytest.raises(TypeError):
+        klass(
+            url="https://jira.example.local",
+            auth=auth,
+            filter_id=9999
+        )
+
+
 def test_basic_auth_kwargs(klass):
     """Ensure basic_auth kwargs are handeled."""
     basic_auth = dict(username="foo", password="bar")
