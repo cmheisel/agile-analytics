@@ -19,7 +19,7 @@ class BaseFetcher(object):
         Raises:
             NotImplementedError
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
 
 def convert_jira_issue(issue):
