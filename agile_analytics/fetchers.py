@@ -107,6 +107,7 @@ class JIRAFetcher(BaseFetcher):
         else:
             raise TypeError("Neither %s nor %s found in auth parameter" % (self.BASIC_AUTH_KEYS, self.OAUTH_KEYS))
 
+    # TODO: Needs tests
     def fetch(self, jira_klass=JIRA):
         """Fetch data and return AgileTickets.
 

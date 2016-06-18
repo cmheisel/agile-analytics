@@ -103,6 +103,18 @@ def jira_issue():
     return i
 
 
+@pytest.fixture()
+def JIRA(jira_issue):
+    """Fake JIRA instance."""
+    class MockJIRA(object):
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def search_issues(self, *args, **kwargs):
+            return [jira_issue, ]
+    return MockJIRA
+
+
 def test_required_config(klass):
     """Test the required class instantiation values."""
     f = klass(
@@ -165,6 +177,18 @@ def test_extra_kwargs(klass):
     )
     for key, value in extra_kwargs.items():
         assert f.jira_kwargs[key] == value
+
+
+def test_fetch(klass, JIRA):
+    """Ensure the JIRAFetcher fetch method returns issues."""
+    basic_auth = dict(username="foo", password="bar")
+    f = klass(
+        url="https://jira.example.local",
+        auth=basic_auth,
+        filter_id=9999,
+    )
+    tickets = f.fetch(jira_klass=JIRA)
+    assert hasattr(tickets[0], 'flow_log')
 
 
 def test_converter_key(jira_issue, converter):
