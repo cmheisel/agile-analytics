@@ -5,11 +5,11 @@ from .fetchers import (
     convert_jira_issue
 )
 
-from .models import (
-    AgileTicket,
+from .analyzers import (
+    DateAnalyzer,
 )
 
-assert AgileTicket
+assert DateAnalyzer
 assert JIRAFetcher
 assert convert_jira_issue
 
