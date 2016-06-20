@@ -67,3 +67,27 @@ class FlowLog(list):
 
         value[u'state'] = unicode(value['state'])
         super(FlowLog, self).append(value)
+
+
+class AnalyzedAgileTicket(object):
+    """An AgileTicket analyzed within a certain context.
+
+    Attributes:
+        key (unicode): Unique identifier for the ticket in its system of record
+        committed (dict): The state and datetime when the story was committed
+        started (dict): The state and datetime when the story was started
+        ended (dict): The state and datetime when the story was ended
+
+    Optional Attributes:
+        type (unicode): A label of the type of ticket: Story, Epic, Defect
+    """
+
+    def __init__(
+        self, key, committed, started, ended,
+        type="Ticket",
+    ):
+        """Create AnalyzedAgileTickets."""
+        self.key = key
+        self.committed = committed
+        self.started = started
+        self.ended = ended
