@@ -11,13 +11,6 @@ def klass():
 
 
 @pytest.fixture
-def datetime():
-    """Return Datetime module."""
-    from datetime import datetime
-    return datetime
-
-
-@pytest.fixture
 def make_one(klass):
     """Function to make an AgileTicket."""
     def _make_one(*args, **kwargs):
@@ -86,3 +79,25 @@ def test_flow_log_append_unhappy_no_dict(make_one):
     t = make_one()
     with pytest.raises(TypeError):
         t.flow_log.append(['VT', '278461911'])
+
+
+def test_flow_log_ordered_ascending(make_one, days_ago):
+    """Ensure flow log items are oldest > newest."""
+    t = make_one()
+    items = [
+        dict(state="SC", entered_at=days_ago(2)),
+        dict(state="KNAP", entered_at=days_ago(8)),
+        dict(state="Junohaki", entered_at=days_ago(9)),
+        dict(state="MA", entered_at=days_ago(10))
+    ]
+    for i in items:
+        t.flow_log.append(i)
+
+    actual = [fl['state'] for fl in t.flow_log]
+    expected = [
+        "MA",
+        "Junohaki",
+        "KNAP",
+        "SC"
+    ]
+    assert actual == expected

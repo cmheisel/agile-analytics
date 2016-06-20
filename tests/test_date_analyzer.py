@@ -1,6 +1,5 @@
 """Test the bundled Cycle Date analyzer."""
-from dateutil import relativedelta
-from datetime import datetime
+
 
 import pytest
 
@@ -38,16 +37,6 @@ def Ticket():
             t.flow_log.append(fl)
         return t
     return _Ticket
-
-
-@pytest.fixture
-def days_ago():
-    """Helper method for getting dates in the past."""
-    def _days_ago(days):
-        dt = datetime.now() - relativedelta.relativedelta(days=days)
-        dt = dt.replace(second=0, microsecond=0)
-        return dt
-    return _days_ago
 
 
 def test_config(analyzer):
@@ -100,3 +89,24 @@ def test_analyze_missing_committed_state(analyzer, Ticket, days_ago):
     )
     results, ignored_issues = analyzer.analyze([t, ])
     assert len(ignored_issues) == 1
+    assert ignored_issues[0]['ticket'].key == "TEST-1"
+    assert ignored_issues[0]['phase'] == "committed"
+
+
+def test_pick_oldest_date(analyzer, Ticket, days_ago):
+    """Pick the oldest entered_at from the ticket's history."""
+    test_flow_logs = [
+        dict(entered_at=days_ago(9), state="In Progress"),
+        dict(entered_at=days_ago(8), state="Selected"),
+        dict(entered_at=days_ago(5), state="In Progress"),
+        dict(entered_at=days_ago(2), state="Done"),
+        dict(entered_at=days_ago(10), state="Selected"),
+    ]
+    t = Ticket(
+        key="TEST-1",
+        created_at=days_ago(15),
+        updated_at=days_ago(0),
+        flow_logs=test_flow_logs
+    )
+    results, ignored_issues = analyzer.analyze([t, ])
+    assert results[0].committed['entered_at'] == days_ago(10)

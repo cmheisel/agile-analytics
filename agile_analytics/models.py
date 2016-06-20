@@ -67,6 +67,7 @@ class FlowLog(list):
 
         value[u'state'] = unicode(value['state'])
         super(FlowLog, self).append(value)
+        super(FlowLog, self).sort(key=lambda x: x['entered_at'])
 
 
 class AnalyzedAgileTicket(object):
