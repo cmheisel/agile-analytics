@@ -1,20 +1,25 @@
+"""Test the models."""
+
 import pytest
 
 
 @pytest.fixture
 def klass():
+    """Return CUT."""
     from agile_analytics.models import AgileTicket
     return AgileTicket
 
 
 @pytest.fixture
 def datetime():
+    """Return Datetime module."""
     from datetime import datetime
     return datetime
 
 
 @pytest.fixture
 def make_one(klass):
+    """Function to make an AgileTicket."""
     def _make_one(*args, **kwargs):
         kwargs['key'] = kwargs.get('key', "TEST-1")
         return klass(*args, **kwargs)
@@ -22,11 +27,13 @@ def make_one(klass):
 
 
 def test_construction(make_one):
+    """Ensure make_one works."""
     t = make_one()
     assert t
 
 
 def test_flow_log_append_happy(make_one, datetime):
+    """Ensure FlowLogs require entered_at and state."""
     t = make_one()
     t.flow_log.append(
         dict(
@@ -38,6 +45,7 @@ def test_flow_log_append_happy(make_one, datetime):
 
 
 def test_flow_log_append_unicode(make_one, datetime):
+    """Ensure flow log strings are unicode."""
     t = make_one()
     t.flow_log.append(
         dict(
@@ -49,6 +57,7 @@ def test_flow_log_append_unicode(make_one, datetime):
 
 
 def test_flow_log_append_datetime(make_one, datetime):
+    """Ensure flow log datetimes are honored."""
     test_dt = datetime.now()
     t = make_one()
     t.flow_log.append(
@@ -61,6 +70,7 @@ def test_flow_log_append_datetime(make_one, datetime):
 
 
 def test_flow_log_append_unhappy(make_one, datetime):
+    """Ensure we only accept datetime-ish objects."""
     t = make_one()
     with pytest.raises(TypeError):
         t.flow_log.append(
@@ -72,6 +82,7 @@ def test_flow_log_append_unhappy(make_one, datetime):
 
 
 def test_flow_log_append_unhappy_no_dict(make_one):
+    """Ensure we only accept dict-ish objects."""
     t = make_one()
     with pytest.raises(TypeError):
         t.flow_log.append(['VT', '278461911'])
