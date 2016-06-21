@@ -110,3 +110,4 @@ def test_pick_oldest_date(analyzer, Ticket, days_ago):
     )
     results, ignored_issues = analyzer.analyze([t, ])
     assert results[0].committed['entered_at'] == days_ago(10)
+    assert results[0].started['entered_at'] == days_ago(9)
