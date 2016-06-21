@@ -96,11 +96,11 @@ def test_analyze_missing_committed_state(analyzer, Ticket, days_ago):
 def test_pick_oldest_date(analyzer, Ticket, days_ago):
     """Pick the oldest entered_at from the ticket's history."""
     test_flow_logs = [
+        dict(entered_at=days_ago(10), state="Selected"),
         dict(entered_at=days_ago(9), state="In Progress"),
         dict(entered_at=days_ago(8), state="Selected"),
         dict(entered_at=days_ago(5), state="In Progress"),
         dict(entered_at=days_ago(2), state="Done"),
-        dict(entered_at=days_ago(10), state="Selected"),
     ]
     t = Ticket(
         key="TEST-1",
@@ -116,12 +116,13 @@ def test_pick_oldest_date(analyzer, Ticket, days_ago):
 def test_pick_newest_done(analyzer, Ticket, days_ago):
     """Pick the newest entered_at from the ticket's history for done."""
     test_flow_logs = [
+        dict(entered_at=days_ago(10), state="Selected"),
         dict(entered_at=days_ago(9), state="In Progress"),
         dict(entered_at=days_ago(8), state="Selected"),
         dict(entered_at=days_ago(5), state="In Progress"),
-        dict(entered_at=days_ago(2), state="Done"),
+        dict(entered_at=days_ago(3), state="Done"),
+        dict(entered_at=days_ago(2), state="In Progress"),
         dict(entered_at=days_ago(1), state="Done"),
-        dict(entered_at=days_ago(10), state="Selected"),
     ]
     t = Ticket(
         key="TEST-1",
@@ -131,3 +132,33 @@ def test_pick_newest_done(analyzer, Ticket, days_ago):
     )
     results, ignored_issues = analyzer.analyze([t, ])
     assert results[0].ended['entered_at'] == days_ago(1)
+
+
+def test_pick_first_of_multiple_states(klass, Ticket, days_ago):
+    """Pick the first state that matches, so folks can go specific > generic."""
+    analyzer = klass(
+        commit_states=[u"Selected", u"To Do", u"Created"],
+        start_states=[u"Dev In Progress", u"In Progress", ],
+        end_states=[u"Done", u"Accepted"],
+    )
+
+    test_flow_logs = [
+        dict(entered_at=days_ago(30), state="Created"),
+        dict(entered_at=days_ago(20), state="Selected"),
+        dict(entered_at=days_ago(11), state="In Progress"),
+        dict(entered_at=days_ago(10), state="Dev In Progress"),
+        dict(entered_at=days_ago(5), state="Accepted"),
+        dict(entered_at=days_ago(3), state="Done"),
+    ]
+    t = Ticket(
+        key="TEST-1",
+        created_at=days_ago(15),
+        updated_at=days_ago(0),
+        flow_logs=test_flow_logs
+    )
+    results, ignored_issues = analyzer.analyze([t, ])
+    at = results[0]
+
+    assert at.committed['entered_at'] == days_ago(20)
+    assert at.started['entered_at'] == days_ago(10)
+    assert at.ended['entered_at'] == days_ago(3)
