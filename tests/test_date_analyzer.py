@@ -111,3 +111,23 @@ def test_pick_oldest_date(analyzer, Ticket, days_ago):
     results, ignored_issues = analyzer.analyze([t, ])
     assert results[0].committed['entered_at'] == days_ago(10)
     assert results[0].started['entered_at'] == days_ago(9)
+
+
+def test_pick_newest_done(analyzer, Ticket, days_ago):
+    """Pick the newest entered_at from the ticket's history for done."""
+    test_flow_logs = [
+        dict(entered_at=days_ago(9), state="In Progress"),
+        dict(entered_at=days_ago(8), state="Selected"),
+        dict(entered_at=days_ago(5), state="In Progress"),
+        dict(entered_at=days_ago(2), state="Done"),
+        dict(entered_at=days_ago(1), state="Done"),
+        dict(entered_at=days_ago(10), state="Selected"),
+    ]
+    t = Ticket(
+        key="TEST-1",
+        created_at=days_ago(15),
+        updated_at=days_ago(0),
+        flow_logs=test_flow_logs
+    )
+    results, ignored_issues = analyzer.analyze([t, ])
+    assert results[0].ended['entered_at'] == days_ago(1)

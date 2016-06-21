@@ -73,7 +73,10 @@ class DateAnalyzer(object):
         }
 
         for phase, state_list in self.states_context.items():
-            state, datetime = self._find_entered_at(state_list, ticket)
+            dupe_strategy = "oldest"
+            if phase == "ended":
+                dupe_strategy = "newest"
+            state, datetime = self._find_entered_at(state_list, ticket, dupe_strategy=dupe_strategy)
             if None in (state, datetime):
                 msg = "{key} is missing flow_log information for {state_list}".format(key=ticket.key, state_list=state_list)
                 raise MissingPhaseInformation(
@@ -84,8 +87,15 @@ class DateAnalyzer(object):
             kwargs[phase] = dict(state=state, entered_at=datetime)
         return AnalyzedAgileTicket(**kwargs)
 
-    def _find_entered_at(self, state_list, ticket):
+    def _find_entered_at(self, state_list, ticket, dupe_strategy="oldest"):
+        entry = dict(state=None, entered_at=None)
+        entries = []
         for i in ticket.flow_log:
             if i['state'] in state_list:
-                return i['state'], i['entered_at']
-        return None, None
+                if dupe_strategy == "oldest":
+                    entry = i
+                    break
+                entries.append(i)
+        if len(entries) > 0 and dupe_strategy == "newest":
+            entry = entries[-1]
+        return entry['state'], entry['entered_at']
