@@ -9,7 +9,21 @@ from .models import AnalyzedAgileTicket
 
 
 class MissingPhaseInformation(Exception):
+    """Raise when a ticket is missing information for a phase.
+
+    Arguments:
+        message (unicode): Human readable string describing the exception.
+        phase (unicode): The phase that no state could be found for.
+        state_list (list[unicode]): List of states that were included in the phase.
+
+    Attritbutes:
+        message (unicode): Human readable string describing the exception.
+        phase (unicode): The phase that no state could be found for.
+        state_list (list[unicode]): List of states that were included in the phase.
+    """
+
     def __init__(self, message, phase, state_list):
+        """Create the exception."""
         self.message = message
         self.phase = phase
         self.state_list = state_list
