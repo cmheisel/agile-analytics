@@ -102,7 +102,6 @@ class DateAnalyzer(object):
         return AnalyzedAgileTicket(**kwargs)
 
     def _find_entered_at(self, state_list, ticket, dupe_strategy="oldest"):
-        print "_find_entered_at: {}, {}".format(state_list, dupe_strategy)
         entry = dict(state=None, entered_at=None)
         entries = []
         for state_name in state_list:
