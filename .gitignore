@@ -1,5 +1,6 @@
 # Debugging scripts
 tryout.py
+tryout.csv
 tests/json/*.json
 
 # Build artifacts
