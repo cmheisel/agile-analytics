@@ -4,6 +4,7 @@ from collections import namedtuple
 from datetime import date
 
 from dateutil.relativedelta import relativedelta
+from dateutil.tz import tzutc
 
 Report = namedtuple("Report", ["table", "summary"])
 
@@ -23,7 +24,6 @@ class ThroughputReporter(object):
         self.period = period
         self.start_date = start_date
         self.end_date = end_date
-        object.__init__(self)
 
     @property
     def start_date(self):
@@ -31,6 +31,8 @@ class ThroughputReporter(object):
 
     @start_date.setter
     def start_date(self, value):
+        if value and value.tzinfo is None:
+            value = value.replace(tzinfo=tzutc())
         self._start_date = value
 
     @property
@@ -39,6 +41,8 @@ class ThroughputReporter(object):
 
     @end_date.setter
     def end_date(self, value):
+        if value and value.tzinfo is None:
+            value = value.replace(tzinfo=tzutc())
         self._end_date = value
 
     def valid_start_date(self, target_date, period):
