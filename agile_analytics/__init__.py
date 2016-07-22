@@ -18,4 +18,4 @@ assert JIRAFetcher
 assert convert_jira_issue
 
 __author__ = 'cmheisel'
-__version__ = (0, 1, 0)
+__version__ = (0, 2, 0)
