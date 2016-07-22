@@ -58,17 +58,18 @@ class ThroughputReporter(object):
         return target_date
 
     def starts_of_weeks(self):
-        start = self.start_date
-        end = self.end_date
-        week_starting = date(start.year, start.month, start.day)
-        while week_starting <= date(end.year, end.month, end.day):
+        week_starting = self.start_date.date()
+        while week_starting <= self.end_date.date():
             yield week_starting
             week_starting += relativedelta(days=7)
 
     def _count_by_week(self, issues):
         counted_by_week = {}
         for week_starting in self.starts_of_weeks():
-            counted_by_week[week_starting] = 0
+            week_end = week_starting + relativedelta(days=6)
+            counted_by_week[week_starting] = len(
+                [i for i in issues if i.ended['entered_at'].date() >= week_starting and i.ended['entered_at'].date() <= week_end]
+            )
 
         return counted_by_week
 

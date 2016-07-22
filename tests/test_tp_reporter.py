@@ -107,12 +107,12 @@ def test_report_summary_table(klass, datetime, date, AnalyzedAgileTicket):
 
     expected = [
         ["Week", "Completed"],
-        [date(2016, 5, 15), ],
-        [date(2016, 5, 22), ],
-        [date(2016, 5, 29), ],
-        [date(2016, 6, 5), ],
-        [date(2016, 6, 12), ],
-        [date(2016, 6, 19), ],
+        [date(2016, 5, 15), 4],
+        [date(2016, 5, 22), 0],
+        [date(2016, 5, 29), 0],
+        [date(2016, 6, 5), 4],
+        [date(2016, 6, 12), 0],
+        [date(2016, 6, 19), 0],
     ]
 
     report = r.report_on(analyzed_issues)
@@ -123,3 +123,4 @@ def test_report_summary_table(klass, datetime, date, AnalyzedAgileTicket):
         expected_row = expected[i]
         actual_row = report.table[i]
         assert expected_row[0] == actual_row[0]
+        assert expected_row[1] == actual_row[1]
