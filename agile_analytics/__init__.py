@@ -13,9 +13,15 @@ from .reporters import (
     ThroughputReporter,
 )
 
+from .writers import (
+    CSVWriter,
+)
+
 assert DateAnalyzer
 assert JIRAFetcher
 assert convert_jira_issue
+assert CSVWriter
+assert ThroughputReporter
 
 __author__ = 'cmheisel'
-__version__ = (0, 1, 0)
+__version__ = (0, 2, 0)
