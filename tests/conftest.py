@@ -30,6 +30,13 @@ def relativedelta():
 
 
 @pytest.fixture
+def StringIO():
+    """Return StringIO."""
+    import StringIO
+    return StringIO
+
+
+@pytest.fixture
 def days_ago(datetime, relativedelta, tzutc):
     """Helper method for getting dates in the past."""
     def _days_ago(days):
