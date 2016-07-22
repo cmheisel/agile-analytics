@@ -85,10 +85,11 @@ class AnalyzedAgileTicket(object):
 
     def __init__(
         self, key, committed, started, ended,
-        type="Ticket",
+        ttype="Ticket",
     ):
         """Create AnalyzedAgileTickets."""
         self.key = key
         self.committed = committed
         self.started = started
         self.ended = ended
+        self.type = ttype

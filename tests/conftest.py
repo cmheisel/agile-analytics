@@ -10,6 +10,13 @@ def datetime():
 
 
 @pytest.fixture
+def date():
+    """Return Datetime module."""
+    from datetime import date
+    return date
+
+
+@pytest.fixture
 def relativedelta():
     """Return relativedelta module."""
     from dateutil import relativedelta
