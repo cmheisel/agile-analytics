@@ -9,6 +9,10 @@ from .analyzers import (
     DateAnalyzer,
 )
 
+from .reporters import (
+    ThroughputReporter,
+)
+
 assert DateAnalyzer
 assert JIRAFetcher
 assert convert_jira_issue
