@@ -2,9 +2,10 @@ language: python
 python:
   - "3.5"
 install:
-  - make agile_analytics.egg-info
+  - pip install -r requirements.txt
   - pip install python-coveralls
-script: "make test"
+  - python setup.py develop
+script: "py.test -svv --flake8 --cov=agile_analytics tests/"
 after_success:
   coveralls
 deploy:
