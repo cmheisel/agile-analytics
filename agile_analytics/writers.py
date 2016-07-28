@@ -7,7 +7,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 
 class CSVWriter(object):
-    def write(self, destination, report):
+    def write(self, report, destination):
         """Write a CSV version of the report.
         Arguments:
             desitnation (file-like object): The file-like object where the data should be written to.
