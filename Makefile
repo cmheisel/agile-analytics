@@ -1,5 +1,5 @@
 venv:
-	virtualenv ./venv
+	if [ -d "$(HOME)/virtualenv/python3.5/bin/" ]; then $(HOME)/virtualenv/python3.5/bin/pip install virtualenv && $(HOME)/virtualenv/python3.5/bin/virtualenv ./venv; else virtualenv ./venv; fi
 
 reqs: venv
 	./venv/bin/pip install -r requirements.txt && touch reqs
@@ -15,7 +15,7 @@ systest: test tryout.py
 	./venv/bin/python tryout.py
 
 clean_pycs:
-	find . -name "*.pyc" -exec rm -rf {} \;
+	find . | grep -E "(__pycache__|\.pyc)" | xargs rm -rf
 
 clean: clean_pycs
 	rm -rf venv

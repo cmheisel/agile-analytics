@@ -211,20 +211,20 @@ def test_converter_key(jira_issue, converter):
 def test_converter_created_at(jira_issue, converter, tz):
     """Ensure created_at is populated."""
     t = converter(jira_issue)
-    assert t.created_at == datetime(2016, 03, 30, 17, 27, 9, tzinfo=tz)
+    assert t.created_at == datetime(2016, 3, 30, 17, 27, 9, tzinfo=tz)
 
 
 def test_converter_updated_at(jira_issue, converter, tz):
     """Ensure updated_at is populated."""
     t = converter(jira_issue)
-    assert t.updated_at == datetime(2016, 05, 18, 16, 17, 21, tzinfo=tz)
+    assert t.updated_at == datetime(2016, 5, 18, 16, 17, 21, tzinfo=tz)
 
 
 def test_changelog_conversion(jira_issue, converter, tz):
     """Ensure the changelog is converted as expected."""
     expected = [
         dict(
-            entered_at=datetime(2016, 03, 30, 17, 27, 9, tzinfo=tz),
+            entered_at=datetime(2016, 3, 30, 17, 27, 9, tzinfo=tz),
             state=u"Created"
         ),
         dict(
@@ -232,23 +232,23 @@ def test_changelog_conversion(jira_issue, converter, tz):
             state=u"In Progress"
         ),
         dict(
-            entered_at=datetime(2016, 04, 27, 14, 21, 24, tzinfo=tz),
+            entered_at=datetime(2016, 4, 27, 14, 21, 24, tzinfo=tz),
             state=u"BLOCKED",
         ),
         dict(
-            entered_at=datetime(2016, 05, 02, 14, 48, 32, tzinfo=tz),
+            entered_at=datetime(2016, 5, 2, 14, 48, 32, tzinfo=tz),
             state=u"In Progress",
         ),
         dict(
-            entered_at=datetime(2016, 05, 03, 18, 01, 10, tzinfo=tz),
+            entered_at=datetime(2016, 5, 3, 18, 1, 10, tzinfo=tz),
             state=u"In QA",
         ),
         dict(
-            entered_at=datetime(2016, 05, 05, 18, 42, 25, tzinfo=tz),
+            entered_at=datetime(2016, 5, 5, 18, 42, 25, tzinfo=tz),
             state=u"Done",
         ),
         dict(
-            entered_at=datetime(2016, 05, 18, 16, 17, 21, tzinfo=tz),
+            entered_at=datetime(2016, 5, 18, 16, 17, 21, tzinfo=tz),
             state=u"Accepted",
         )
     ]

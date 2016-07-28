@@ -42,7 +42,7 @@ def convert_jira_issue(issue):
     t.flow_log.append(
         dict(
             entered_at=t.created_at,
-            state=unicode("Created"),
+            state=str("Created"),
         )
     )
 
@@ -52,7 +52,7 @@ def convert_jira_issue(issue):
                 t.flow_log.append(
                     dict(
                         entered_at=parse(history.created),
-                        state=unicode(item.toString)
+                        state=str(item.toString)
                     )
                 )
 

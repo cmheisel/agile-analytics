@@ -15,6 +15,7 @@ from .reporters import (
 
 from .writers import (
     CSVWriter,
+    GSheetWriter
 )
 
 assert DateAnalyzer
@@ -24,4 +25,4 @@ assert CSVWriter
 assert ThroughputReporter
 
 __author__ = 'cmheisel'
-__version__ = (0, 2, 0)
+__version__ = (0, 3, 0)

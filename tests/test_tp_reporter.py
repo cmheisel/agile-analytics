@@ -119,7 +119,7 @@ def test_report_summary_table(klass, datetime, date, AnalyzedAgileTicket, tzutc)
     assert report.table[0] == expected[0]
     assert len(report.table) == len(expected)
 
-    for i in xrange(0, len(expected)):
+    for i in range(0, len(expected)):
         expected_row = expected[i]
         actual_row = report.table[i]
         assert expected_row[0] == actual_row[0]

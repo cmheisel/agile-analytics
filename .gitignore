@@ -2,6 +2,7 @@
 tryout.py
 tryout.csv
 tests/json/*.json
+*_secret.json
 
 # Build artifacts
 reqs

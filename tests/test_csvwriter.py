@@ -33,7 +33,7 @@ def test_write(klass, report, StringIO):
     w = klass()
     csvstring = StringIO.StringIO()
 
-    expected = r"""Week,Completed
+    expected = """Week,Completed
 2016-05-15,4
 2016-05-22,0
 2016-05-29,0
@@ -41,7 +41,7 @@ def test_write(klass, report, StringIO):
 2016-06-12,0
 2016-06-19,0"""
 
-    w.write(csvstring, report)
+    w.write(report, csvstring)
     expected = expected.split()
     actual = csvstring.getvalue().split()
     assert expected == actual

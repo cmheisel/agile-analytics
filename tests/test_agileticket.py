@@ -46,7 +46,7 @@ def test_flow_log_append_unicode(make_one, datetime):
             state="LA",
         )
     )
-    assert t.flow_log[0][u'state'] == unicode("LA")
+    assert t.flow_log[0][u'state'] == str("LA")
 
 
 def test_flow_log_append_datetime(make_one, datetime):
