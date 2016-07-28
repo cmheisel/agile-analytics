@@ -32,8 +32,8 @@ def relativedelta():
 @pytest.fixture
 def StringIO():
     """Return StringIO."""
-    import StringIO
-    return StringIO
+    import io
+    return io
 
 
 @pytest.fixture

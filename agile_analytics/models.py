@@ -18,7 +18,7 @@ class AgileTicket(object):
         Args:
             key (str): A unique identifier for this ticket in the system of record
         """
-        self.key = unicode(key)
+        self.key = str(key)
         self.created_at = None
         self.updated_at = None
         self._flow_log = FlowLog()
@@ -61,11 +61,11 @@ class FlowLog(list):
             msgvars = dict(
                 val_type=type(entered_at),
                 val=entered_at,
-                exc=unicode(e)
+                exc=str(e)
             )
             raise TypeError("Flow log items must have a entered_at datetime. Got: {val_type} / {val}, \n Exception: {exc}".format(**msgvars))
 
-        value[u'state'] = unicode(value['state'])
+        value[u'state'] = str(value['state'])
         super(FlowLog, self).append(value)
         self.sort(key=lambda l: l['entered_at'])
 

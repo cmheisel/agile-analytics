@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 import agile_analytics
 
 
-README = file('README.md', 'r').read()
+README = open('README.md', 'r').read()
 version = ".".join(map(str, agile_analytics.__version__))
 author = agile_analytics.__author__
 description = agile_analytics.__doc__

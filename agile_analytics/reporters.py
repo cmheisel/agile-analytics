@@ -95,7 +95,7 @@ class ThroughputReporter(object):
         filtered_issues = self.filter_issues(issues)
         counted_by_week = self._count_by_week(filtered_issues)
 
-        weeks = counted_by_week.keys()
+        weeks = list(counted_by_week.keys())
         weeks.sort()
         for week in weeks:
             r.table.append([week, counted_by_week[week]])
