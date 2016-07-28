@@ -148,3 +148,40 @@ def test_update_sheet(klass, mocker):
     assert mock_cell.value == ""
     mock_sheet.update_cells.assert_called_once_with([mock_cell, ])
     assert mock_sheet.insert_row.call_count == len(fistful_of_datas)
+
+
+def test_write_find_by_name(klass, mocker):
+    """Ensure write finds docs by name."""
+    report = mocker.Mock()
+    report.table = [
+        ['Ionic', 'Doric', 'Corinthian'],
+        ['how to get the weeaboo to stop using the holodeck', 'malarkey', ''],
+        ['does universal translator work on the weeaboo', ],
+        ['can the brexit breed with the weeaboo', 'which moon is sailor moon from', 'is there dilithium in crystal pepsi'],
+    ]
+
+    mock_cell = mocker.Mock(value="Hanging Chad")
+    mock_sheet_attrs = {
+        'findall.return_value': [
+            mock_cell
+        ]
+    }
+    mock_sheet = mocker.Mock(**mock_sheet_attrs)
+    mock_doc = mocker.Mock()
+    mock_doc.worksheet.return_value = mock_sheet
+
+    mock_driver_result = mocker.Mock()
+    mock_driver_result.open.return_value = mock_doc
+    klass.DRIVER_MODULE.authorize.return_value = mock_driver_result
+
+    k = klass('foo')
+
+    k.write(report, "Test Name", "Sheet Name")
+
+    k.driver.open.called_once_with("Test Name")
+    mock_doc.worksheet.called_once_with("Sheet Name")
+    mock_doc.add_worksheet.assert_not_called()
+    mock_sheet.resize.assert_called_once_with(1, 3)
+    assert mock_cell.value == ""
+    mock_sheet.update_cells.assert_called_once_with([mock_cell, ])
+    assert mock_sheet.insert_row.call_count == len(report.table)
