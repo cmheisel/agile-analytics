@@ -75,3 +75,32 @@ def test_get_datasheet_exception(klass, mocker, gspread):
     k.get_datasheet(mock_doc, "Foo")
     mock_doc.worksheet.called_once_with("Foo")
     mock_doc.add_worksheet.called_once_with("Foo", 1, 1)
+
+
+def test_clear_sheet_resizes(klass, mocker):
+    """Verify clear_sheet resizes."""
+    mock_attrs = {
+        'findall.return_value': []
+    }
+    mock_sheet = mocker.Mock(**mock_attrs)
+
+    k = klass('foo')
+    k.clear_sheet(mock_sheet, 1, 20)
+    mock_sheet.resize.assert_called_once_with(1, 20)
+
+
+def test_clear_sheet_replaces_content(klass, mocker):
+    """Verify clear_sheet empties out any remaining content."""
+    mock_cell = mocker.Mock(value="Hanging Chad")
+    mock_sheet_attrs = {
+        'findall.return_value': [
+            mock_cell
+        ]
+    }
+    mock_sheet = mocker.Mock(**mock_sheet_attrs)
+
+    k = klass('foo')
+    k.clear_sheet(mock_sheet, 1, 1)
+
+    assert mock_cell.value == ""
+    mock_sheet.update_cells.assert_called_once_with([mock_cell, ])
