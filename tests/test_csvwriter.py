@@ -33,7 +33,7 @@ def test_write(klass, report, StringIO):
     w = klass()
     csvstring = StringIO.StringIO()
 
-    expected = r"""Week,Completed
+    expected = """Week,Completed
 2016-05-15,4
 2016-05-22,0
 2016-05-29,0
