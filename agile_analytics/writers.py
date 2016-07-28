@@ -26,23 +26,28 @@ class GSheetWriter(object):
     Arguments:
         keyfile_name (str): The path to a JSON file with the service account credentials you want to use.
     """
-    def __init__(self, keyfile_name="client_secret.json", credential_klass=ServiceAccountCredentials):
+
+    CREDENTIAL_CLASS = ServiceAccountCredentials
+    DRIVER_MODULE = gspread
+
+    def __init__(self, keyfile_name="client_secret.json"):
         self.keyfile_name = keyfile_name
         self.scope = ['https://spreadsheets.google.com/feeds']
-        self.credentials = self.get_credentials(self.keyfile_name, self.scope, credential_klass)
 
-    def get_credentials(self, keyfile_name, scope, credential_klass):
+    @property
+    def credentials(self):
         """Load the JSON and return ServiceAccountCredentials
-        Arguments:
-            keyfile_name (str): The path to the JSON containing the key file
-            credential_klass (AssertionCredentials): A class that implements from_json_keyfile_name
         Returns:
             Credentials: The oauth2client compatible credentials object based on the JSON.
         """
-        credentials = credential_klass.from_json_keyfile_name(keyfile_name, scope)
+        credentials = self.CREDENTIAL_CLASS.from_json_keyfile_name(self.keyfile_name, self.scope)
         return credentials
 
-    def get_datasheet(self, doc, name="Data"):
+    @property
+    def driver(self):
+        return self.DRIVER_MODULE.authorize(self.credentials)
+
+    def get_datasheet(self, doc, name):
         """Finds (or creates) the worksheet in the supplied google spreadsheet.
         Arguments:
             doc (Spreadsheet): The spreadsheet instance where you'd like the worksheet to exist.
@@ -95,5 +100,7 @@ class GSheetWriter(object):
         self.clear_sheet(sheet, 1, len(data[0]))
         self.append_to_sheet(sheet, data)
 
-    def write(self, report, doc_id=None, doc_name=None, sheet_name="Data"):
-        pass
+    def write(self, report, doc_name, sheet_name):
+        doc = self.driver.open(doc_name)
+        sheet = self.get_datasheet(doc, sheet_name)
+        self.update_sheet(sheet, report.table)
