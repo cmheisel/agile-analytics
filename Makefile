@@ -1,5 +1,5 @@
 venv:
-	if [ -d "$(HOME)/virtualenv/python3.5/bin/" ]; then $(HOME)/virtualenv/python3.5/bin/virtualenv ./venv; else virtualenv ./venv; fi
+	if [ -d "$(HOME)/virtualenv/python3.5/bin/" ]; then $(HOME)/virtualenv/python3.5/bin/pip install virtualenv && $(HOME)/virtualenv/python3.5/bin/virtualenv ./venv; else virtualenv ./venv; fi
 
 reqs: venv
 	./venv/bin/pip install -r requirements.txt && touch reqs
