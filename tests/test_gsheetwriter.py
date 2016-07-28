@@ -104,3 +104,21 @@ def test_clear_sheet_replaces_content(klass, mocker):
 
     assert mock_cell.value == ""
     mock_sheet.update_cells.assert_called_once_with([mock_cell, ])
+
+
+def test_append_to_sheet(klass, mocker):
+    """Verify append_to_sheet appends only the data passed to it."""
+
+    fistful_of_datas = [
+        ['Ionic', 'Doric', 'Corinthian'],
+        ['how to get the weeaboo to stop using the holodeck', 'malarkey', ''],
+        ['does universal translator work on the weeaboo', ],
+        ['can the brexit breed with the weeaboo', 'which moon is sailor moon from', 'is there dilithium in crystal pepsi'],
+    ]
+
+    mock_sheet = mocker.Mock()
+
+    k = klass('foo')
+    k.append_to_sheet(mock_sheet, fistful_of_datas)
+
+    assert mock_sheet.insert_row.call_count == len(fistful_of_datas)
