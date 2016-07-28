@@ -15,6 +15,7 @@ from .reporters import (
 
 from .writers import (
     CSVWriter,
+    GSheetWriter
 )
 
 assert DateAnalyzer

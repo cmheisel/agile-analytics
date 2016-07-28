@@ -20,7 +20,7 @@ pytest==2.9.2
 pytest-flake8==0.5
 coverage==4.1
 pytest-cov==2.2.1
-
+pytest-mock==1.1
 pretend==1.0.8
 
 # gspread API client
