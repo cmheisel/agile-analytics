@@ -7,3 +7,14 @@ install:
 script: "make test"
 after_success:
   coveralls
+deploy:
+    # test pypi
+  - provider: pypi
+    server: https://testpypi.python.org/pypi
+    user: "cmheisel"
+    password:
+      secure: "K+JpMmKkoIpPvYGnpo7Ujp3jrF55m6L5ewYqAuEwpzIDDLjqLmI4jq3UIHOXLgrIJsr1PmMsRlZetAi7ytc2Rbj9GNCo2vXHTilAp5wIBvtqWc+G+aCiLtxmX5xQdF6V+hkOuD8OM+VqZJxVOzpJrxq6go85qMVabmL0mJCq1xC85VewqNxzcE7fRCfvqToY9L+Q+K/OdBnlJ9WFJUO6KOCswm9djhcvNsGVBetiPcv1IYC5E9tVfqaBguthAXHOWkotv4PRYpS9W8xs/aNl//Sg85Ra+bOt0Rdr3d8R+Kt5ouigDM2N4o5J88dz11cWoq+o8J6zLP9JgYLP75ZUoylo+VSIEg+YNBEeYKdeB/B9b8X+A2Vr0H1Wc/LUTX/VK+3IjPsv2fT2ya3lphtOJtl97LeSlrQPwJFb6zJm2XEsdcS0rhEQjC3LXaSahyp0azsaCIcgVnBs5HeP/dBO3PstJLYIh6IGVJylwqdVsh4pajD2hOWqIzfD0LYZauXZBR68CF13GQ8DIsB2fcpOXZ+ra+hYnF7ny/4qZEMBjkUMilZ0WDcT7m8W9hfkThtcY28/Xs5rz/qu3dzVxlXgZkxWzOUDeRsQvHaZS1gfcs+el66G6zF17h1pLJU4PwAHQu9SaQ1yEHHYxr/i1HNhiQa5aG5xRNC3H2wXOh6t6xE="
+    on:
+      branch: master
+      tags: false
+      condition: $TRAVIS_PYTHON_VERSION = "3.5"
