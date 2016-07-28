@@ -122,3 +122,29 @@ def test_append_to_sheet(klass, mocker):
     k.append_to_sheet(mock_sheet, fistful_of_datas)
 
     assert mock_sheet.insert_row.call_count == len(fistful_of_datas)
+
+
+def test_update_sheet(klass, mocker):
+    """Ensure update_sheet clears the data and then adds the new data."""
+    fistful_of_datas = [
+        ['Ionic', 'Doric', 'Corinthian'],
+        ['how to get the weeaboo to stop using the holodeck', 'malarkey', ''],
+        ['does universal translator work on the weeaboo', ],
+        ['can the brexit breed with the weeaboo', 'which moon is sailor moon from', 'is there dilithium in crystal pepsi'],
+    ]
+
+    mock_cell = mocker.Mock(value="Hanging Chad")
+    mock_sheet_attrs = {
+        'findall.return_value': [
+            mock_cell
+        ]
+    }
+    mock_sheet = mocker.Mock(**mock_sheet_attrs)
+
+    k = klass('foo')
+    k.update_sheet(mock_sheet, fistful_of_datas)
+
+    mock_sheet.resize.assert_called_once_with(1, 3)
+    assert mock_cell.value == ""
+    mock_sheet.update_cells.assert_called_once_with([mock_cell, ])
+    assert mock_sheet.insert_row.call_count == len(fistful_of_datas)
