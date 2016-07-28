@@ -16,6 +16,7 @@ systest: test tryout.py
 
 clean_pycs:
 	find . -name "*.pyc" -exec rm -rf {} \;
+	find . -name "__pycache__" -exec rm -rf {} \;
 
 clean: clean_pycs
 	rm -rf venv
