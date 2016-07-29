@@ -23,6 +23,7 @@ assert JIRAFetcher
 assert convert_jira_issue
 assert CSVWriter
 assert ThroughputReporter
+assert GSheetWriter
 
 __author__ = 'cmheisel'
-__version__ = (0, 3, 1)
+__version__ = (0, 3, 2)
