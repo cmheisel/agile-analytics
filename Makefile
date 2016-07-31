@@ -4,10 +4,10 @@ venv:
 reqs: venv
 	./venv/bin/pip install -r requirements.txt && touch reqs
 
-agile_analytics.egg-info: reqs
+agile_analytics.egg-info/PKG-INFO: reqs
 	./venv/bin/python setup.py develop
 
-test: agile_analytics.egg-info
+test: agile_analytics.egg-info/PKG-INFO
 	./venv/bin/py.test -svv --flake8 --cov=agile_analytics tests/
 
 systest: test tryout.py
@@ -18,14 +18,24 @@ clean_pycs:
 	find . | grep -E "(__pycache__|\.pyc)" | xargs rm -rf
 
 clean: clean_pycs
+	rm -rf sdist-venv
 	rm -rf .coverage
 	rm -rf .cache
 	rm -rf reqs
 	rm -rf venv
 	rm -rf agile_analytics.egg-info
+	rm -rf dist
 
 docs: reqs
 	cd docs && make html
 
+version: agile_analytics.egg-info/PKG-INFO
+	./venv/bin/python -c "import agile_analytics; open('version.txt', 'w').write(agile_analytics.version)"
 
-.PHONY: test clean clean_pycs docs climate
+test_sdist: version clean
+	python setup.py sdist
+	virtualenv ./sdist-venv
+	./sdist-venv/bin/pip install ./dist/*.tar.gz
+	./sdist-venv/bin/python -c "import agile_analytics"
+
+.PHONY: test clean clean_pycs docs version systest
