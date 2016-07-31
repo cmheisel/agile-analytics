@@ -11,6 +11,7 @@ from .analyzers import (
 
 from .reporters import (
     ThroughputReporter,
+    LeadTimeDistributionReporter,
 )
 
 from .writers import (
@@ -23,7 +24,8 @@ assert JIRAFetcher
 assert convert_jira_issue
 assert CSVWriter
 assert ThroughputReporter
+assert LeadTimeDistributionReporter
 assert GSheetWriter
 
 __author__ = 'cmheisel'
-__version__ = (0, 3, 2)
+__version__ = (0, 4, 0)
