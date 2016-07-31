@@ -27,4 +27,4 @@ assert ThroughputReporter
 assert GSheetWriter
 
 __author__ = 'cmheisel'
-__version__ = (0, 3, 2)
+__version__ = (0, 4, 0)
