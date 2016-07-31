@@ -131,18 +131,19 @@ class LeadTimeDistributionReporter(Reporter):
         r.table.append(["Lead Time", "Tickets"])
         filtered_issues = self.filter_issues(issues)
 
-        lead_times = [i.lead_time for i in filtered_issues]
-        lead_times = array(lead_times)
-        hist_values, hist_bins = histogram(
-            lead_times,
-            bins=arange(0, max(lead_times) + 2, 1)
-        )
+        if filtered_issues:
+            lead_times = [i.lead_time for i in filtered_issues]
+            lead_times = array(lead_times)
+            hist_values, hist_bins = histogram(
+                lead_times,
+                bins=arange(0, max(lead_times) + 2, 1)
+            )
 
-        for i in range(0, len(hist_values)):
-            if i == 0:
-                continue
-            row = [hist_bins[i], hist_values[i]]
-            r.table.append(row)
+            for i in range(0, len(hist_values)):
+                if i == 0:
+                    continue
+                row = [hist_bins[i], hist_values[i]]
+                r.table.append(row)
         return r
 
 

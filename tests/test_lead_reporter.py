@@ -73,6 +73,42 @@ def test_filter(klass, days_agos, AnalyzedAgileTicket, tzutc):
     assert len(filtered_issues) == 2
 
 
+def test_report_summary(klass, datetime, tzutc):
+    """report_on returns an object with meta data."""
+    start_date = datetime(2016, 5, 15, 0, 0, 0, tzinfo=tzutc)  # Sunday
+    end_date = datetime(2016, 6, 25, 11, 59, 59, tzinfo=tzutc)  # Saturday
+
+    r = klass(
+        title="Cycle Time Distribution Past 30 days",
+        start_date=start_date,
+        end_date=end_date
+    )
+
+    expected = dict(
+        title="Cycle Time Distribution Past 30 days",
+        start_date=start_date,
+        end_date=end_date,
+    )
+
+    assert r.report_on([]).summary == expected
+
+
+def test_report_table_empty(klass, days_agos):
+    """Ensure an empty list of tickets is handled."""
+    expected = [
+        ["Lead Time", "Tickets"]
+    ]
+    r = klass(
+        title="Cycle Time Distribution Past 30 days",
+        start_date=days_agos[30],
+        end_date=days_agos[0]
+    )
+
+    report = r.report_on([])
+
+    assert report.table == expected
+
+
 def test_report_table(klass, days_agos, AnalyzedAgileTicket, tzutc):
     """report_on returns an object with a tabular represenation of the data"""
     issue_list_kwargs = []
