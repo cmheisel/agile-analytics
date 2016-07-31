@@ -18,6 +18,9 @@ clean_pycs:
 	find . | grep -E "(__pycache__|\.pyc)" | xargs rm -rf
 
 clean: clean_pycs
+	rm -rf .coverage
+	rm -rf .cache
+	rm -rf reqs
 	rm -rf venv
 	rm -rf agile_analytics.egg-info
 
