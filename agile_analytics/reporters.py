@@ -5,6 +5,8 @@ from collections import namedtuple
 from dateutil.relativedelta import relativedelta
 from dateutil.tz import tzutc
 
+from numpy import histogram, array, arange
+
 Report = namedtuple("Report", ["table", "summary"])
 
 
@@ -115,6 +117,33 @@ class LeadTimeDistributionReporter(Reporter):
         """Ignore issues completed outside the start/end range."""
         filtered_issues = [i for i in issues if i.ended and (i.ended['entered_at'] >= self.start_date and i.ended['entered_at'] <= self.end_date)]
         return filtered_issues
+
+    def report_on(self, issues):
+        """Generate a report object with a lead time histogram."""
+        r = Report(
+            table=[],
+            summary=dict(
+                title=self.title,
+                start_date=self.start_date,
+                end_date=self.end_date
+            )
+        )
+        r.table.append(["Lead Time", "Tickets"])
+        filtered_issues = self.filter_issues(issues)
+
+        lead_times = [i.lead_time for i in filtered_issues]
+        lead_times = array(lead_times)
+        hist_values, hist_bins = histogram(
+            lead_times,
+            bins=arange(0, max(lead_times) + 2, 1)
+        )
+
+        for i in range(0, len(hist_values)):
+            if i == 0:
+                continue
+            row = [hist_bins[i], hist_values[i]]
+            r.table.append(row)
+        return r
 
 
 class ThroughputReporter(Reporter):

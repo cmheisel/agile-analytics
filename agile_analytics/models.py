@@ -94,6 +94,10 @@ class AnalyzedAgileTicket(object):
         self.ended = ended
         self.type = ttype
 
+    def __repr__(self):
+        """Represention of the object."""
+        return "{} -- Ended: {}".format(self.key, self.ended['entered_at'])
+
     @property
     def lead_time(self):
         """Number of days between committed and ended."""
