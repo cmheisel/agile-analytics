@@ -1,7 +1,6 @@
 """Make reports from data."""
 
 from collections import namedtuple
-from datetime import date
 
 from dateutil.relativedelta import relativedelta
 from dateutil.tz import tzutc
@@ -111,6 +110,11 @@ class LeadTimeDistributionReporter(Reporter):
         """Ensure we end on a Sunday."""
         target_date = super().valid_end_date(target_date)
         return self.walk_forward_to_weekday(target_date, self.SATURDAY)
+
+    def filter_issues(self, issues):
+        """Ignore issues completed outside the start/end range."""
+        filtered_issues = [i for i in issues if i.ended and (i.ended['entered_at'] >= self.start_date and i.ended['entered_at'] <= self.end_date)]
+        return filtered_issues
 
 
 class ThroughputReporter(Reporter):
