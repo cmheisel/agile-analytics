@@ -28,6 +28,8 @@ def test_klass(klass, days_ago):
     assert k.started['entered_at'] == four_ago
     assert k.ended['entered_at'] == today
 
+    assert "{} -- Ended: {}".format(k.key, k.ended['entered_at']) == str(k)
+
 
 def test_lead_time(klass, days_ago):
     """Verify lead_time calculations."""
