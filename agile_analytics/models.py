@@ -93,3 +93,15 @@ class AnalyzedAgileTicket(object):
         self.started = started
         self.ended = ended
         self.type = ttype
+
+    @property
+    def lead_time(self):
+        """Number of days between committed and ended."""
+        diff = self.ended['entered_at'] - self.committed['entered_at']
+        return diff.days
+
+    @property
+    def cycle_time(self):
+        """Number of days between started and ended."""
+        diff = self.ended['entered_at'] - self.started['entered_at']
+        return diff.days
