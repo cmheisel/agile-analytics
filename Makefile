@@ -36,6 +36,6 @@ test_sdist: version clean
 	python setup.py sdist
 	virtualenv ./sdist-venv
 	./sdist-venv/bin/pip install ./dist/*.tar.gz
-	./sdist-venv/bin/python -c "import agile_analytics"
+	./sdist-venv/bin/python -c "import agile_analytics; assert agile_analytics"
 
 .PHONY: test clean clean_pycs docs version systest
