@@ -8,6 +8,7 @@ from dateutil.tz import tzutc
 
 Report = namedtuple("Report", ["table", "summary"])
 
+
 class Reporter(object):
     """Base class for Reporters.
 
@@ -16,6 +17,14 @@ class Reporter(object):
         start_date (datetime): The starting range of the report.
         end_date (datetime): The ending range of the report.
     """
+
+    MONDAY = 0
+    TUESDAY = 1
+    WEDNESDAY = 2
+    THURSDAY = 3
+    FRIDAY = 4
+    SATURDAY = 5
+    SUNDAY = 6
 
     def __init__(self, title, start_date=None, end_date=None):
         self.title = title
@@ -61,6 +70,30 @@ class Reporter(object):
         """
         return target_date
 
+    def walk_back_to_weekday(self, target_date, day):
+        """Returns the nearest date that predates the target_date.
+        Arguments:
+            target_date (datetime): The date to start with.
+            day (int): An integer between 0 (Monday) and 6 (Sunday)
+        Returns:
+            datetime: The nearest date that predates the target_date for the given day.
+        """
+        while target_date.weekday() != day:
+            target_date = target_date - relativedelta(days=1)
+        return target_date
+
+    def walk_forward_to_weekday(self, target_date, day):
+        """Returns the nearest date that postdates the target_date.
+        Arguments:
+            target_date (datetime): The date to start with.
+            day (int): An integer between 0 (Monday) and 6 (Sunday)
+        Returns:
+            datetime: The nearest date that postdates the target_date for the given day.
+        """
+        while target_date.weekday() != day:
+            target_date = target_date + relativedelta(days=1)
+        return target_date
+
     def filter_issues(self, issues):
         raise NotImplementedError
 
@@ -69,7 +102,15 @@ class Reporter(object):
 
 
 class LeadTimeDistributionReporter(Reporter):
-    pass
+    def valid_start_date(self, target_date):
+        """Ensure we start on a Sunday."""
+        target_date = super().valid_start_date(target_date)
+        return self.walk_back_to_weekday(target_date, self.SUNDAY)
+
+    def valid_end_date(self, target_date):
+        """Ensure we end on a Sunday."""
+        target_date = super().valid_end_date(target_date)
+        return self.walk_forward_to_weekday(target_date, self.SATURDAY)
 
 
 class ThroughputReporter(Reporter):
