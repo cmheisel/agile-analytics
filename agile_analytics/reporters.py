@@ -8,8 +8,71 @@ from dateutil.tz import tzutc
 
 Report = namedtuple("Report", ["table", "summary"])
 
+class Reporter(object):
+    """Base class for Reporters.
 
-class ThroughputReporter(object):
+    Attributes:
+        title (unicode): The name of the report
+        start_date (datetime): The starting range of the report.
+        end_date (datetime): The ending range of the report.
+    """
+
+    def __init__(self, title, start_date=None, end_date=None):
+        self.title = title
+        self.start_date = start_date
+        self.end_date = end_date
+        super().__init__()
+
+    @property
+    def start_date(self):
+        return self.valid_start_date(self._start_date)
+
+    @start_date.setter
+    def start_date(self, value):
+        if value and value.tzinfo is None:
+            value = value.replace(tzinfo=tzutc())
+        self._start_date = value
+
+    @property
+    def end_date(self):
+        return self.valid_end_date(self._end_date)
+
+    @end_date.setter
+    def end_date(self, value):
+        if value and value.tzinfo is None:
+            value = value.replace(tzinfo=tzutc())
+        self._end_date = value
+
+    def valid_start_date(self, target_date):
+        """Returns a date that is valid for the start of the report.
+        Arguments:
+            target_date (datetime): The date you'd like examined
+        Returns:
+            datetime: A datetime made valid for the report based on the target_date argument.
+        """
+        return target_date
+
+    def valid_end_date(self, target_date):
+        """Returns a date that is valid for the end of the report.
+        Arguments:
+            target_date (datetime): The date you'd like examined
+        Returns:
+            datetime: A datetime made valid for the report based on the target_date argument.
+        """
+        return target_date
+
+    def filter_issues(self, issues):
+        raise NotImplementedError
+
+    def report_on(self, issues):
+        raise NotImplementedError
+
+
+class LeadTimeDistributionReporter(Reporter):
+    pass
+
+
+class ThroughputReporter(Reporter):
     """Generate throughput reports.
 
     Attributes:
@@ -24,37 +87,20 @@ class ThroughputReporter(object):
         self.period = period
         self.start_date = start_date
         self.end_date = end_date
+        super().__init__(title, start_date, end_date)
 
-    @property
-    def start_date(self):
-        return self.valid_start_date(self._start_date, self.period)
-
-    @start_date.setter
-    def start_date(self, value):
-        if value and value.tzinfo is None:
-            value = value.replace(tzinfo=tzutc())
-        self._start_date = value
-
-    @property
-    def end_date(self):
-        return self.valid_end_date(self._end_date, self.period)
-
-    @end_date.setter
-    def end_date(self, value):
-        if value and value.tzinfo is None:
-            value = value.replace(tzinfo=tzutc())
-        self._end_date = value
-
-    def valid_start_date(self, target_date, period):
-        if period == "weekly" and target_date.weekday() != 6:
+    def valid_start_date(self, target_date):
+        target_date = super().valid_start_date(target_date)
+        if self.period == "weekly" and target_date.weekday() != 6:
             # Walk back to a Sunday
             while target_date.weekday() != 6:
                 target_date = target_date - relativedelta(days=1)
 
         return target_date
 
-    def valid_end_date(self, target_date, period):
-        if period == "weekly" and target_date.weekday() != 5:
+    def valid_end_date(self, target_date):
+        target_date = super().valid_end_date(target_date)
+        if self.period == "weekly" and target_date.weekday() != 5:
             # Walk forward to a Saturday
             while target_date.weekday() != 5:
                 target_date = target_date + relativedelta(days=1)

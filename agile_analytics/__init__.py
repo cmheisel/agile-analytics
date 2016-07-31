@@ -11,6 +11,7 @@ from .analyzers import (
 
 from .reporters import (
     ThroughputReporter,
+    LeadTimeDistributionReporter,
 )
 
 from .writers import (
