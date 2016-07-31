@@ -132,20 +132,14 @@ class ThroughputReporter(Reporter):
 
     def valid_start_date(self, target_date):
         target_date = super().valid_start_date(target_date)
-        if self.period == "weekly" and target_date.weekday() != 6:
-            # Walk back to a Sunday
-            while target_date.weekday() != 6:
-                target_date = target_date - relativedelta(days=1)
-
+        if self.period == "weekly":
+            target_date = self.walk_back_to_weekday(target_date, self.SUNDAY)
         return target_date
 
     def valid_end_date(self, target_date):
         target_date = super().valid_end_date(target_date)
-        if self.period == "weekly" and target_date.weekday() != 5:
-            # Walk forward to a Saturday
-            while target_date.weekday() != 5:
-                target_date = target_date + relativedelta(days=1)
-
+        if self.period == "weekly":
+            target_date = self.walk_forward_to_weekday(target_date, self.SATURDAY)
         return target_date
 
     def starts_of_weeks(self):
