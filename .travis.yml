@@ -9,7 +9,7 @@ script: "py.test -svv --flake8 --cov=agile_analytics tests/"
 after_success:
   coveralls
 deploy:
-    # test pypi
+  # test pypi
   - provider: pypi
     server: https://testpypi.python.org/pypi
     user: "cmheisel"
@@ -18,4 +18,19 @@ deploy:
     on:
       branch: master
       tags: false
+      condition: $TRAVIS_PYTHON_VERSION = "3.5"
+  # production pypi
+  - provider: pypi
+    user: "cmheisel"
+    password:
+      secure: "vOugYIR93Z4n3wL1W3VV2uF1i/Vv7/shu/xtCgf5MymInK1RnyZRQLE1FgdBFOrLQkqXI3d7ALRH3zauwtnisy9CmjTLRkxW1ypt3HER
+bB0N0JJKqx/NWRBHzJCTkdip0pwNUI9GK2fdsZonne340iUKkH/I8oinV2o3DhrSxtDbA0wfJaIGnUQAOOektG8KlmVzs83mKm+t4Yk1u5lmTfsGbVS
+WkicEVAnXWdNaMRy5fHNgawWHRIXrQ2z7Z9ik5pIpQftCm8ljyhQwxTWftrs4akLJawvyofhxT3Y8+rbT6Tpxzx9KEtwoSbe7lOTIeFBeMlhDdXOPv2
+mYJneEXpfTO/Mrrl90Igx2kEx5mF6ql4J2rsvHeC9BU72HdMCEDra61mmn8x/xB11cxn5m4B2GIaSaOqVPsE8oXEtgt1JE0ujpmWaUS4D9gpMH2zbXQ
+Sub9OLP4LYLbcWa3+6IeR0tD7s7gjkQSV1tn5qdidqrmW1bOEhQ2Uu9wkSiirJ3+ccfT/HKS/s3xRe1tIV34yuhbcLQC1HOqA34FSV0t+qzRW7+sw8v
+LFdSWPW02aGrof80qSp/lxVaOJc3qoM2hEBtyQvOWMywHveAR8Vw+O+GuZOf02dkD/LTK2sgowzL0fZAjfpwqZQMlB0F2zyBRofT941CoViIF+q3Fm6
+n3rc="
+    on:
+      branch: master
+      tags: true
       condition: $TRAVIS_PYTHON_VERSION = "3.5"
