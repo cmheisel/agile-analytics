@@ -1,5 +1,7 @@
 """Pulls data from agile systems and analyzes it."""
 
+from .version import __version__, __author__
+
 from .fetchers import (
     JIRAFetcher,
     convert_jira_issue
@@ -26,6 +28,7 @@ assert CSVWriter
 assert ThroughputReporter
 assert LeadTimeDistributionReporter
 assert GSheetWriter
+assert __version__
+assert __author__
 
-__author__ = 'cmheisel'
-__version__ = (0, 4, 0)
+version = ".".join(map(str, __version__))
