@@ -24,6 +24,7 @@ assert JIRAFetcher
 assert convert_jira_issue
 assert CSVWriter
 assert ThroughputReporter
+assert LeadTimeDistributionReporter
 assert GSheetWriter
 
 __author__ = 'cmheisel'
