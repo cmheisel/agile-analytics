@@ -102,7 +102,14 @@ class Reporter(object):
         raise NotImplementedError
 
 
+class TicketReporter(Reporter):
+    """Generates a report listing all the tickets that match the filter critiera."""
+    pass
+
+
 class LeadTimeDistributionReporter(Reporter):
+    """Generates lead time distribution report for tickets completed in a single date range."""
+
     def valid_start_date(self, target_date):
         """Ensure we start on a Sunday."""
         target_date = super().valid_start_date(target_date)
