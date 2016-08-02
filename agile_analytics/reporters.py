@@ -122,7 +122,14 @@ class TicketReporter(Reporter):
     def report_on(self, issues):
         """Generate a report, one row per issue, with details."""
         issues = self.filter_issues(issues)
-        r = Report(table=[], summary=dict())
+        r = Report(
+            table=[],
+            summary=dict(
+                title=self.title,
+                start_date=self.start_date,
+                end_date=self.end_date
+            )
+        )
 
         r.table.append(
             ["Key", "Lead Time", "Commit State", "Commit At", "Start State", "Start At", "End State", "End At"],

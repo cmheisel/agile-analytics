@@ -103,3 +103,23 @@ def test_report_table(klass, AnalyzedAgileTicket, days_agos):
 
     actual = r.report_on(issue_list)
     assert expected == actual.table
+
+
+def test_report_summary(klass, datetime, tzutc):
+    """report_on returns an object with meta data."""
+    start_date = datetime(2016, 5, 15, 0, 0, 0, tzinfo=tzutc)  # Sunday
+    end_date = datetime(2016, 6, 25, 11, 59, 59, tzinfo=tzutc)  # Saturday
+
+    r = klass(
+        title="Foo",
+        start_date=start_date,
+        end_date=end_date
+    )
+
+    expected = dict(
+        title="Foo",
+        start_date=start_date,
+        end_date=end_date,
+    )
+
+    assert r.report_on([]).summary == expected
