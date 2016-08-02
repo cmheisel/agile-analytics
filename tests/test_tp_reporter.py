@@ -10,13 +10,6 @@ def klass():
     return ThroughputReporter
 
 
-@pytest.fixture
-def AnalyzedAgileTicket():
-    """Return a class used by the CUT."""
-    from agile_analytics.models import AnalyzedAgileTicket
-    return AnalyzedAgileTicket
-
-
 def test_title(klass):
     """Ensure the title gets set."""
     r = klass(

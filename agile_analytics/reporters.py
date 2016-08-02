@@ -104,7 +104,43 @@ class Reporter(object):
 
 class TicketReporter(Reporter):
     """Generates a report listing all the tickets that match the filter critiera."""
-    pass
+    def valid_start_date(self, target_date):
+        """Ensure we start on a Sunday."""
+        target_date = super().valid_start_date(target_date)
+        return self.walk_back_to_weekday(target_date, self.SUNDAY)
+
+    def valid_end_date(self, target_date):
+        """Ensure we end on a Sunday."""
+        target_date = super().valid_end_date(target_date)
+        return self.walk_forward_to_weekday(target_date, self.SATURDAY)
+
+    def filter_issues(self, issues):
+        """Ignore issues completed outside the start/end range."""
+        filtered_issues = [i for i in issues if i.ended and (i.ended['entered_at'] >= self.start_date and i.ended['entered_at'] <= self.end_date)]
+        return filtered_issues
+
+    def report_on(self, issues):
+        """Generate a report, one row per issue, with details."""
+        issues = self.filter_issues(issues)
+        r = Report(table=[], summary=dict())
+
+        r.table.append(
+            ["Key", "Lead Time", "Commit State", "Commit At", "Start State", "Start At", "End State", "End At"],
+        )
+        for i in issues:
+            row = [
+                i.key,
+                i.lead_time,
+                i.committed['state'],
+                i.committed['entered_at'],
+                i.started['state'],
+                i.started['entered_at'],
+                i.ended['state'],
+                i.ended['entered_at'],
+            ]
+            r.table.append(row)
+
+        return r
 
 
 class LeadTimeDistributionReporter(Reporter):

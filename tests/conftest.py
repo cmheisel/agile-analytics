@@ -3,6 +3,22 @@ import pytest
 
 
 @pytest.fixture
+def days_agos(days_ago):
+    """Return 45 dates ending with today."""
+    days_agos = {}
+    for i in range(0, 46):
+        days_agos[i] = days_ago(i)
+    return days_agos
+
+
+@pytest.fixture
+def AnalyzedAgileTicket():
+    """Return a class used by the CUT."""
+    from agile_analytics.models import AnalyzedAgileTicket
+    return AnalyzedAgileTicket
+
+
+@pytest.fixture
 def datetime():
     """Return Datetime module."""
     from datetime import datetime
