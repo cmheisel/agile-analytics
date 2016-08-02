@@ -8,7 +8,8 @@ agile_analytics.egg-info/PKG-INFO: reqs
 	./venv/bin/python setup.py develop
 
 test: agile_analytics.egg-info/PKG-INFO
-	./venv/bin/py.test -svv --flake8 --cov=agile_analytics tests/
+	./venv/bin/py.test -svv --flake8
+	./venv/bin/py.test -svv --cov=agile_analytics tests/
 
 systest: test tryout.py
 	# Poor man's system test, not committed because it requies a real jira

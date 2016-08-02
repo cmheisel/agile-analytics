@@ -4,26 +4,10 @@ import pytest
 
 
 @pytest.fixture
-def AnalyzedAgileTicket():
-    """Return a class used by the CUT."""
-    from agile_analytics.models import AnalyzedAgileTicket
-    return AnalyzedAgileTicket
-
-
-@pytest.fixture
 def klass():
     """Provide the CUT."""
     from agile_analytics import LeadTimeDistributionReporter
     return LeadTimeDistributionReporter
-
-
-@pytest.fixture
-def days_agos(days_ago):
-    """Return 35 dates ending with today."""
-    days_agos = {}
-    for i in range(0, 46):
-        days_agos[i] = days_ago(i)
-    return days_agos
 
 
 def test_klass(klass):

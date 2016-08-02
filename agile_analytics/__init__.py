@@ -14,6 +14,7 @@ from .analyzers import (
 from .reporters import (
     ThroughputReporter,
     LeadTimeDistributionReporter,
+    TicketReporter,
 )
 
 from .writers import (
@@ -21,14 +22,19 @@ from .writers import (
     GSheetWriter
 )
 
-assert DateAnalyzer
-assert JIRAFetcher
-assert convert_jira_issue
-assert CSVWriter
-assert ThroughputReporter
-assert LeadTimeDistributionReporter
-assert GSheetWriter
-assert __version__
-assert __author__
-
 version = ".".join(map(str, __version__))
+
+
+__all__ = [
+    "version",
+    "__version__",
+    "__author__",
+    "JIRAFetcher",
+    "convert_jira_issue",
+    "DateAnalyzer",
+    "ThroughputReporter",
+    "LeadTimeDistributionReporter",
+    "TicketReporter",
+    "CSVWriter",
+    "GSheetWriter",
+]
