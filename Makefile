@@ -33,7 +33,7 @@ docs: reqs
 version: agile_analytics.egg-info/PKG-INFO
 	./venv/bin/python -c "import agile_analytics; open('version.txt', 'w').write(agile_analytics.version)"
 
-test_sdist: version clean
+test_sdist: test version clean
 	python setup.py sdist
 	virtualenv ./sdist-venv
 	./sdist-venv/bin/pip install ./dist/*.tar.gz
