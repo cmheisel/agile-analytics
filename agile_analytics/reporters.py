@@ -122,6 +122,7 @@ class TicketReporter(Reporter):
     def report_on(self, issues):
         """Generate a report, one row per issue, with details."""
         issues = self.filter_issues(issues)
+        issues.sort(key=lambda x: x.ended['entered_at'])
         r = Report(
             table=[],
             summary=dict(

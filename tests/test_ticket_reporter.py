@@ -72,12 +72,13 @@ def test_report_table(klass, AnalyzedAgileTicket, days_agos):
     for i in range(1, 3):  # 2 issues with 2 day lead
         kwargs = dict(
             key="TEST-{}".format(i),
-            committed=dict(state="Committed", entered_at=days_agos[2]),
-            started=dict(state="Started", entered_at=days_agos[2]),
-            ended=dict(state="Ended", entered_at=days_agos[0]),
+            committed=dict(state="Committed", entered_at=days_agos[i+3]),
+            started=dict(state="Started", entered_at=days_agos[i+2]),
+            ended=dict(state="Ended", entered_at=days_agos[i]),
         )
         issue_list_kwargs.append(kwargs)
     issue_list = [AnalyzedAgileTicket(**kwargs) for kwargs in issue_list_kwargs]
+    issue_list.sort(key=lambda i: i.ended['entered_at'])
 
     expected = [
         ["Key", "Lead Time", "Commit State", "Commit At", "Start State", "Start At", "End State", "End At"],
