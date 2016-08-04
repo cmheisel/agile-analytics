@@ -1,11 +1,12 @@
 """Make reports from data."""
 
 from collections import namedtuple
+from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
 from dateutil.tz import tzutc
 
-from numpy import histogram, array, arange
+from numpy import histogram, array, arange, percentile, round
 
 Report = namedtuple("Report", ["table", "summary"])
 
@@ -95,6 +96,23 @@ class Reporter(object):
             target_date = target_date + relativedelta(days=1)
         return target_date
 
+    def filter_on_ended(self, issues):
+        """Returns issues that were ended between the instances start/end dates.
+        Arguments:
+            issues (list[AnalyzedAgileTicket]): List of issues to be filtered_issues
+        Return:
+            list[AnalyzedAgileTicket]: List of issues that match.
+        """
+        filtered_issues = [i for i in issues if i.ended and (i.ended['entered_at'] >= self.start_date and i.ended['entered_at'] <= self.end_date)]
+        return filtered_issues
+
+    def starts_of_weeks(self):
+        """Return a list of dates that start each week between start_date and end_date."""
+        week_starting = self.walk_back_to_weekday(self.start_date.date(), self.SUNDAY)
+        while week_starting <= self.end_date.date():
+            yield week_starting
+            week_starting += relativedelta(days=7)
+
     def filter_issues(self, issues):
         raise NotImplementedError
 
@@ -116,8 +134,7 @@ class TicketReporter(Reporter):
 
     def filter_issues(self, issues):
         """Ignore issues completed outside the start/end range."""
-        filtered_issues = [i for i in issues if i.ended and (i.ended['entered_at'] >= self.start_date and i.ended['entered_at'] <= self.end_date)]
-        return filtered_issues
+        return self.filter_on_ended(issues)
 
     def report_on(self, issues):
         """Generate a report, one row per issue, with details."""
@@ -166,8 +183,7 @@ class LeadTimeDistributionReporter(Reporter):
 
     def filter_issues(self, issues):
         """Ignore issues completed outside the start/end range."""
-        filtered_issues = [i for i in issues if i.ended and (i.ended['entered_at'] >= self.start_date and i.ended['entered_at'] <= self.end_date)]
-        return filtered_issues
+        return self.filter_on_ended(issues)
 
     def report_on(self, issues):
         """Generate a report object with a lead time histogram."""
@@ -195,6 +211,75 @@ class LeadTimeDistributionReporter(Reporter):
                     continue
                 row = [hist_bins[i], hist_values[i]]
                 r.table.append(row)
+        return r
+
+
+class LeadTimePercentileReporter(Reporter):
+    """Report on Lead Time Percentiles, calculated over a 4 week period.
+    Attributes:
+        title (unicode): The name of the report
+        start_date (datetime): The starting range of issues for the report.
+        end_date (datetime): The ending range of issues for the report.
+        num_weeks (int): The number of weeks you'd like reported on. Default: 4
+    """
+
+    def __init__(self, title, start_date=None, end_date=None, num_weeks=4):
+        super().__init__(title, start_date, end_date)
+        self.num_weeks = num_weeks
+
+    def valid_start_date(self, target_date):
+        target_date = super().valid_start_date(target_date)
+        target_date = self.walk_back_to_weekday(target_date, self.SUNDAY)
+        return target_date
+
+    def valid_end_date(self, target_date):
+        target_date = super().valid_end_date(target_date)
+        target_date = self.walk_forward_to_weekday(target_date, self.SATURDAY)
+        return target_date
+
+    def filter_issues(self, issues):
+        return self.filter_on_ended(issues)
+
+    def _lead_times_for_week(self, week_start, issues):
+        week_end = self.walk_forward_to_weekday(week_start, self.SATURDAY)
+        week_start = datetime(week_start.year, week_start.month, week_start.day, 0, 0, 0, tzinfo=tzutc())
+        week_end = datetime(week_end.year, week_end.month, week_end.day, 11, 59, 59, tzinfo=tzutc())
+        return [i.lead_time for i in issues if i.ended['entered_at'] >= week_start and i.ended['entered_at'] <= week_end]
+
+    def report_on(self, issues):
+        r = Report(
+            table=[],
+            summary=dict(
+                title=self.title,
+                start_date=self.start_date,
+                end_date=self.end_date,
+                num_weeks=self.num_weeks)
+        )
+        headers = ["Week", "50th", "75th", "95th"]
+        r.table.append(headers)
+
+        issues = self.filter_issues(issues)
+
+        percentiles_by_week = []
+        moving_sample = []
+        for sunday in self.starts_of_weeks():
+            moving_sample.append(self._lead_times_for_week(sunday, issues))
+            # Lets limit our percentile calc to the past 4 weeks
+            if len(moving_sample) > 4:
+                moving_sample.pop(0)
+
+            samples = []
+            for sample_set in moving_sample:
+                samples.extend(sample_set)
+            the_50th = int(round(percentile(samples, 50)))
+            the_75th = int(round(percentile(samples, 75)))
+            the_95th = int(round(percentile(samples, 95)))
+
+            percentiles_by_week.append([sunday, the_50th, the_75th, the_95th])
+
+        for row in percentiles_by_week[-self.num_weeks:]:
+            r.table.append(row)
+
         return r
 
 
@@ -227,12 +312,6 @@ class ThroughputReporter(Reporter):
             target_date = self.walk_forward_to_weekday(target_date, self.SATURDAY)
         return target_date
 
-    def starts_of_weeks(self):
-        week_starting = self.start_date.date()
-        while week_starting <= self.end_date.date():
-            yield week_starting
-            week_starting += relativedelta(days=7)
-
     def _count_by_week(self, issues):
         counted_by_week = {}
         for week_starting in self.starts_of_weeks():
@@ -244,8 +323,7 @@ class ThroughputReporter(Reporter):
         return counted_by_week
 
     def filter_issues(self, issues):
-        filtered_issues = [i for i in issues if i.ended and (i.ended['entered_at'] >= self.start_date and i.ended['entered_at'] <= self.end_date)]
-        return filtered_issues
+        return self.filter_on_ended(issues)
 
     def report_on(self, issues):
         r = Report(
