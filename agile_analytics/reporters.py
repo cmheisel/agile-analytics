@@ -168,8 +168,53 @@ class TicketReporter(Reporter):
         return r
 
 
-class SLAReporter(TicketReporter):
-    pass
+class SLAReporter(Reporter):
+    """Generates a report showing the number of tickets per week that exceeded their SLA."""
+    def valid_start_date(self, target_date):
+        """Ensure we start on a Sunday."""
+        target_date = super().valid_start_date(target_date)
+        return self.walk_back_to_weekday(target_date, self.SUNDAY)
+
+    def valid_end_date(self, target_date):
+        """Ensure we end on a Sunday."""
+        target_date = super().valid_end_date(target_date)
+        return self.walk_forward_to_weekday(target_date, self.SATURDAY)
+
+    def filter_issues(self, issues):
+        """Ignore issues completed outside the start/end range."""
+        return self.filter_on_ended(issues)
+
+    def _issues_for_week(self, week_start, issues):
+        week_end = self.walk_forward_to_weekday(week_start, self.SATURDAY)
+        week_start = datetime(week_start.year, week_start.month, week_start.day, 0, 0, 0, tzinfo=tzutc())
+        week_end = datetime(week_end.year, week_end.month, week_end.day, 11, 59, 59, tzinfo=tzutc())
+        return [i for i in issues if i.ended['entered_at'] >= week_start and i.ended['entered_at'] <= week_end]
+
+    def report_on(self, issues, sla_config={}):
+        r = Report(
+            table=[],
+            summary=dict(
+                title=self.title,
+                start_date=self.start_date,
+                end_date=self.end_date
+            )
+        )
+
+        issues = self.filter_issues(issues)
+        ticket_types = list(set([issue.type for issue in issues]))
+        ticket_types.sort()
+        headers = ["Week", ]
+        headers.extend(ticket_types)
+        r.table.append(headers)
+
+        for sunday in self.starts_of_weeks():
+            this_weeks_issues = self._issues_for_week(sunday, issues)
+            row = [sunday, ]
+            for ttype in ticket_types:
+                row.append(len([i for i in this_weeks_issues if i.type == ttype and i.lead_time > sla_config[ttype]]))
+            r.table.append(row)
+
+        return r
 
 
 class LeadTimeDistributionReporter(Reporter):
