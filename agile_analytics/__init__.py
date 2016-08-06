@@ -16,6 +16,7 @@ from .reporters import (
     LeadTimeDistributionReporter,
     TicketReporter,
     LeadTimePercentileReporter,
+    SLAReporter,
 )
 
 from .writers import (
@@ -38,5 +39,6 @@ __all__ = [
     "TicketReporter",
     "CSVWriter",
     "GSheetWriter",
-    "LeadTimePercentileReporter"
+    "LeadTimePercentileReporter",
+    "SLAReporter"
 ]

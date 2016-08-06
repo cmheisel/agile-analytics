@@ -168,6 +168,10 @@ class TicketReporter(Reporter):
         return r
 
 
+class SLAReporter(TicketReporter):
+    pass
+
+
 class LeadTimeDistributionReporter(Reporter):
     """Generates lead time distribution report for tickets completed in a single date range."""
 
