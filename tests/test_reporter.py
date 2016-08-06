@@ -69,3 +69,50 @@ def test_report_on(instance):
     """Verify that report_on raises NotImplementedError."""
     with pytest.raises(NotImplementedError):
         instance.report_on([])
+
+
+def test_starts_of_weeks(klass, relativedelta, datetime, tzutc):
+    """Should return a list of datetimes == the Sundays starting each week between start_ and end_date."""
+    instance = klass(
+        title="Foo",
+        start_date=datetime(2016, 5, 15, 0, 0, 0, tzinfo=tzutc),  # Sunday,
+        end_date=datetime(2016, 6, 25, 11, 59, 59, tzinfo=tzutc)  # Saturday
+    )
+    week_starts = list(instance.starts_of_weeks())
+    expected_start_of_last_week = instance.end_date.date() - relativedelta.relativedelta(days=6)
+    assert week_starts[0] == instance.start_date.date()
+    assert week_starts[-1] == expected_start_of_last_week
+    for start in week_starts:
+        assert start.weekday() == instance.SUNDAY
+
+
+def test_filter_on_ended(klass, days_agos, AnalyzedAgileTicket):
+    """Verify that filter_on_ended only includes tickets that ended in the instance date range."""
+    issue_list_kwargs = []
+    for i in range(1, 3):  # 2 issues with 2 day lead
+        kwargs = dict(
+            key="TEST-{}".format(i),
+            committed=dict(state="Committed", entered_at=days_agos[2]),
+            started=dict(state="Started", entered_at=days_agos[2]),
+            ended=dict(state="Ended", entered_at=days_agos[0]),
+        )
+        issue_list_kwargs.append(kwargs)
+
+    issue_list = [AnalyzedAgileTicket(**kwargs) for kwargs in issue_list_kwargs]
+    issue_out_of_range = AnalyzedAgileTicket(
+        key="TEST-OOR",
+        committed=dict(state="Committed", entered_at=days_agos[42]),
+        started=dict(state="Started", entered_at=days_agos[44]),
+        ended=dict(state="Ended", entered_at=days_agos[45]),
+    )
+    issue_list.append(issue_out_of_range)
+
+    r = klass(
+        title="Cycle Time Distribution Past 30 days",
+        start_date=days_agos[30],
+        end_date=days_agos[0]
+    )
+    filtered_issues = r.filter_on_ended(issue_list)
+
+    assert r.start_date > issue_out_of_range.ended['entered_at']
+    assert len(filtered_issues) == 2
