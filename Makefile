@@ -32,6 +32,9 @@ docs: reqs
 
 version: agile_analytics.egg-info/PKG-INFO
 	./venv/bin/python -c "import agile_analytics; open('version.txt', 'w').write(agile_analytics.version)"
+	git add agile_analytics/version.py
+	git add version.txt
+	git commit -m "Version bump."
 
 test_sdist: test version clean
 	python setup.py sdist
