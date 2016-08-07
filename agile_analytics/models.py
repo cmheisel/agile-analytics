@@ -12,7 +12,7 @@ class AgileTicket(object):
         updated_at (datetime): When was the ticket last updated
     """
 
-    def __init__(self, key):
+    def __init__(self, key, ttype="Ticket"):
         """Init an AgileTicket.
 
         Args:
@@ -21,6 +21,7 @@ class AgileTicket(object):
         self.key = str(key)
         self.created_at = None
         self.updated_at = None
+        self.type = ttype
         self._flow_log = FlowLog()
 
     @property

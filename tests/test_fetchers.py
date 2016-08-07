@@ -257,3 +257,16 @@ def test_changelog_conversion(jira_issue, converter, tz):
     t = converter(i)
 
     assert t.flow_log == expected
+
+
+def test_ticket_type_capture(jira_issue, converter, tz):
+    """The type of ticket should be captured."""
+    t = converter(jira_issue)
+    assert t.type == "Story"
+
+
+def test_ticket_type_default(jira_issue, converter, tz):
+    """The type of ticket should be Ticket if issuetype can't be found."""
+    del jira_issue.fields.issuetype
+    t = converter(jira_issue)
+    assert t.type == "Ticket"

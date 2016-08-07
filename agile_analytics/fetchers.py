@@ -35,7 +35,12 @@ def convert_jira_issue(issue):
     Raises:
         None
     """
-    t = AgileTicket(issue.key)
+    try:
+        ttype = issue.fields.issuetype.name
+    except AttributeError:
+        ttype = "Ticket"
+
+    t = AgileTicket(issue.key, ttype=ttype)
 
     t.created_at = parse(issue.fields.created)
     t.updated_at = parse(issue.fields.updated)
