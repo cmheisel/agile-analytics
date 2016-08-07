@@ -22,23 +22,6 @@ def analyzer(klass):
     return a
 
 
-@pytest.fixture
-def Ticket():
-    """Create an AgileTicket for testing."""
-    from agile_analytics.models import AgileTicket
-
-    def _Ticket(**kwargs):
-        flow_logs = kwargs.pop('flow_logs')
-        key = kwargs.pop('key')
-        t = AgileTicket(key=key)
-        for key, value in kwargs.items():
-            setattr(t, key, value)
-        for fl in flow_logs:
-            t.flow_log.append(fl)
-        return t
-    return _Ticket
-
-
 def test_config(analyzer):
     """Ensure the analyzer inits properly."""
     assert u"In Progress" in analyzer.start_states
@@ -162,3 +145,30 @@ def test_pick_first_of_multiple_states(klass, Ticket, days_ago):
     assert at.committed['entered_at'] == days_ago(20)
     assert at.started['entered_at'] == days_ago(10)
     assert at.ended['entered_at'] == days_ago(3)
+
+
+def test_capturing_ticket_type(klass, Ticket, days_ago):
+    """The Ticket.type should be passed onto the analyzed ticket."""
+    analyzer = klass(
+        commit_states=[u"Selected", u"To Do", u"Created"],
+        start_states=[u"Dev In Progress", u"In Progress", ],
+        end_states=[u"Done", u"Accepted"],
+    )
+    test_flow_logs = [
+        dict(entered_at=days_ago(30), state="Created"),
+        dict(entered_at=days_ago(20), state="Selected"),
+        dict(entered_at=days_ago(11), state="In Progress"),
+        dict(entered_at=days_ago(10), state="Dev In Progress"),
+        dict(entered_at=days_ago(5), state="Accepted"),
+        dict(entered_at=days_ago(3), state="Done"),
+    ]
+    t = Ticket(
+        key="TEST-1",
+        created_at=days_ago(15),
+        updated_at=days_ago(0),
+        flow_logs=test_flow_logs,
+        ttype="Story"
+    )
+    results, ignored_issues = analyzer.analyze([t, ])
+    at = results[0]
+    assert at.type == "Story"

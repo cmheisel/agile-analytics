@@ -6,6 +6,23 @@ import pytest
 
 
 @pytest.fixture
+def Ticket():
+    """Create an AgileTicket for testing."""
+    from agile_analytics.models import AgileTicket
+
+    def _Ticket(**kwargs):
+        flow_logs = kwargs.pop('flow_logs')
+        key = kwargs.pop('key')
+        t = AgileTicket(key=key, ttype="Story")
+        for key, value in kwargs.items():
+            setattr(t, key, value)
+        for fl in flow_logs:
+            t.flow_log.append(fl)
+        return t
+    return _Ticket
+
+
+@pytest.fixture
 def days_agos(days_ago):
     """Return 45 dates ending with today."""
     days_agos = {}

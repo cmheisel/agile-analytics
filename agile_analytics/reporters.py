@@ -106,6 +106,16 @@ class Reporter(object):
         filtered_issues = [i for i in issues if i.ended and (i.ended['entered_at'] >= self.start_date and i.ended['entered_at'] <= self.end_date)]
         return filtered_issues
 
+    def filter_on_committed(self, issues):
+        """Returns issues that were committed to between the instances start/end dates.
+        Arguments:
+            issues (list[AnalyzedAgileTicket]): List of issues to be filtered_issues
+        Return:
+            list[AnalyzedAgileTicket]: List of issues that match.
+        """
+        filtered_issues = [i for i in issues if i.ended and (i.committed['entered_at'] >= self.start_date and i.committed['entered_at'] <= self.end_date)]
+        return filtered_issues
+
     def starts_of_weeks(self):
         """Return a list of dates that start each week between start_date and end_date."""
         week_starting = self.walk_back_to_weekday(self.start_date.date(), self.SUNDAY)
@@ -118,6 +128,56 @@ class Reporter(object):
 
     def report_on(self, issues):
         raise NotImplementedError
+
+
+class CreatedReporter(Reporter):
+    """Generates a report listing counts for all the types of tickets created each week."""
+    def valid_start_date(self, target_date):
+        """Ensure we start on a Sunday."""
+        target_date = super().valid_start_date(target_date)
+        return self.walk_back_to_weekday(target_date, self.SUNDAY)
+
+    def valid_end_date(self, target_date):
+        """Ensure we end on a Sunday."""
+        target_date = super().valid_end_date(target_date)
+        return self.walk_forward_to_weekday(target_date, self.SATURDAY)
+
+    def filter_issues(self, issues):
+        """Ignore issues completed outside the start/end range."""
+        return self.filter_on_committed(issues)
+
+    def _issues_for_week(self, week_start, issues):
+        week_end = self.walk_forward_to_weekday(week_start, self.SATURDAY)
+        week_start = datetime(week_start.year, week_start.month, week_start.day, 0, 0, 0, tzinfo=tzutc())
+        week_end = datetime(week_end.year, week_end.month, week_end.day, 11, 59, 59, tzinfo=tzutc())
+        return [i for i in issues if i.committed['entered_at'] >= week_start and i.committed['entered_at'] <= week_end]
+
+    def report_on(self, issues):
+        """Generate a report, one row per week, with counts for each ticket type."""
+        issues = self.filter_issues(issues)
+        r = Report(
+            table=[],
+            summary=dict(
+                title=self.title,
+                start_date=self.start_date,
+                end_date=self.end_date
+            )
+        )
+
+        ticket_types = list(set([issue.type for issue in issues]))
+        ticket_types.sort()
+        headers = ["Week", ]
+        headers.extend(ticket_types)
+        r.table.append(headers)
+
+        for sunday in self.starts_of_weeks():
+            this_weeks_issues = self._issues_for_week(sunday, issues)
+            row = [sunday, ]
+            for ttype in ticket_types:
+                row.append(len([i for i in this_weeks_issues if i.type == ttype]))
+            r.table.append(row)
+
+        return r
 
 
 class TicketReporter(Reporter):
