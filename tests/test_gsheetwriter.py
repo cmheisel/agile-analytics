@@ -106,50 +106,6 @@ def test_clear_sheet_replaces_content(klass, mocker):
     mock_sheet.update_cells.assert_called_once_with([mock_cell, ])
 
 
-def test_append_to_sheet(klass, mocker):
-    """Verify append_to_sheet appends only the data passed to it."""
-
-    fistful_of_datas = [
-        ['Ionic', 'Doric', 'Corinthian'],
-        ['how to get the weeaboo to stop using the holodeck', 'malarkey', ''],
-        ['does universal translator work on the weeaboo', ],
-        ['can the brexit breed with the weeaboo', 'which moon is sailor moon from', 'is there dilithium in crystal pepsi'],
-    ]
-
-    mock_sheet = mocker.Mock()
-
-    k = klass('foo')
-    k.append_to_sheet(mock_sheet, fistful_of_datas)
-
-    assert mock_sheet.insert_row.call_count == len(fistful_of_datas)
-
-
-def test_update_sheet(klass, mocker):
-    """Ensure update_sheet clears the data and then adds the new data."""
-    fistful_of_datas = [
-        ['Ionic', 'Doric', 'Corinthian'],
-        ['how to get the weeaboo to stop using the holodeck', 'malarkey', ''],
-        ['does universal translator work on the weeaboo', ],
-        ['can the brexit breed with the weeaboo', 'which moon is sailor moon from', 'is there dilithium in crystal pepsi'],
-    ]
-
-    mock_cell = mocker.Mock(value="Hanging Chad")
-    mock_sheet_attrs = {
-        'findall.return_value': [
-            mock_cell
-        ]
-    }
-    mock_sheet = mocker.Mock(**mock_sheet_attrs)
-
-    k = klass('foo')
-    k.update_sheet(mock_sheet, fistful_of_datas)
-
-    mock_sheet.resize.assert_called_once_with(1, 3)
-    assert mock_cell.value == ""
-    mock_sheet.update_cells.assert_called_once_with([mock_cell, ])
-    assert mock_sheet.insert_row.call_count == len(fistful_of_datas)
-
-
 def test_write_find_by_name(klass, mocker):
     """Ensure write finds docs by name."""
     report = mocker.Mock()
@@ -160,11 +116,20 @@ def test_write_find_by_name(klass, mocker):
         ['can the brexit breed with the weeaboo', 'which moon is sailor moon from', 'is there dilithium in crystal pepsi'],
     ]
 
-    mock_cell = mocker.Mock(value="Hanging Chad")
+    starting_mock_cells = [
+        MockCell("", 1, 1), MockCell("", 2, 1), MockCell("", 3, 1),
+        MockCell("", 1, 2), MockCell("", 2, 2), MockCell("", 3, 2),
+        MockCell("", 1, 3), MockCell("", 2, 3), MockCell("", 3, 3),
+        MockCell("", 1, 4), MockCell("", 2, 4), MockCell("", 3, 4),
+        MockCell("", 1, 5), MockCell("", 2, 5), MockCell("", 3, 5),
+    ]
+
+    mock_cell = MockCell("", 1, 1)
     mock_sheet_attrs = {
         'findall.return_value': [
-            mock_cell
-        ]
+            mock_cell,
+        ],
+        'range.return_value': starting_mock_cells
     }
     mock_sheet = mocker.Mock(**mock_sheet_attrs)
     mock_doc = mocker.Mock()
@@ -180,8 +145,67 @@ def test_write_find_by_name(klass, mocker):
 
     k.driver.open.called_once_with("Test Name")
     mock_doc.worksheet.called_once_with("Sheet Name")
-    mock_doc.add_worksheet.assert_not_called()
-    mock_sheet.resize.assert_called_once_with(1, 3)
     assert mock_cell.value == ""
-    mock_sheet.update_cells.assert_called_once_with([mock_cell, ])
-    assert mock_sheet.insert_row.call_count == len(report.table)
+    mock_sheet.range.assert_called_once_with('A1:C4')
+    mock_sheet.update_cells.call_count == 2
+
+
+def test_select_cells(klass, mocker):
+    """Ensure the right cells are selcted."""
+    report = mocker.Mock()
+    report.table = [
+        ['Ionic', 'Doric', 'Corinthian'],
+        ['how to get the weeaboo to stop using the holodeck', 'malarkey', ''],
+        ['does universal translator work on the weeaboo', ],
+        ['can the brexit breed with the weeaboo', 'which moon is sailor moon from', 'is there dilithium in crystal pepsi'],
+        ['', ]
+    ]
+
+    mock_sheet = mocker.Mock()
+
+    k = klass('foo')
+    k.select_range(mock_sheet, report.table)
+
+    mock_sheet.range.assert_called_once_with('A1:C5')
+
+
+class MockCell(object):
+    def __init__(self, value, col, row):
+        self.value = value
+        self.col = col
+        self.row = row
+
+    def __repr__(self):
+        return "<MockCell {}{}: '{}'>".format(self.col, self.row, self.value)
+
+
+def test_update_cells(klass, mocker):
+    """Ensure the cells are updated properly."""
+    report = mocker.Mock()
+    report.table = [
+        ['Ionic', 'Doric', 'Corinthian'],
+        ['how to get the weeaboo to stop using the holodeck', 'malarkey', ''],
+        ['does universal translator work on the weeaboo', ],
+        ['can the brexit breed with the weeaboo', 'which moon is sailor moon from', 'is there dilithium in crystal pepsi'],
+        ['', ]
+    ]
+    starting_mock_cells = [
+        MockCell("", 1, 1), MockCell("", 2, 1), MockCell("", 3, 1),
+        MockCell("", 1, 2), MockCell("", 2, 2), MockCell("", 3, 2),
+        MockCell("", 1, 3), MockCell("", 2, 3), MockCell("", 3, 3),
+        MockCell("", 1, 4), MockCell("", 2, 4), MockCell("", 3, 4),
+        MockCell("", 1, 5), MockCell("", 2, 5), MockCell("", 3, 5),
+    ]
+    expected_cells = [
+        MockCell("Ionic", 1, 1), MockCell("Doric", 2, 1), MockCell("Corinthian", 3, 1),
+        MockCell("how to get the weeaboo to stop using the holodeck", 1, 2), MockCell("malarkey", 2, 2), MockCell("", 3, 2),
+        MockCell("does universal translator work on the weeaboo", 1, 3), MockCell("", 2, 3), MockCell("", 3, 3),
+        MockCell("can the brexit breed with the weeaboo", 1, 4), MockCell("which moon is sailor moon from", 2, 4), MockCell("is there dilithium in crystal pepsi", 3, 4),
+        MockCell("", 1, 5), MockCell("", 2, 5), MockCell("", 3, 5),
+    ]
+
+    k = klass('foo')
+    actual = k.update_cells(starting_mock_cells, report.table)
+
+    for actual_item, expected_item in zip(actual, expected_cells):
+        assert (actual_item.row, actual_item.col, actual_item.value) == (expected_item.row, expected_item.col, expected_item.value)
