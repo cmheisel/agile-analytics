@@ -144,7 +144,7 @@ def test_update_sheet(klass, mocker):
     k = klass('foo')
     k.update_sheet(mock_sheet, fistful_of_datas)
 
-    mock_sheet.resize.assert_called_once_with(1, 3)
+    mock_sheet.resize.assert_called_once_with(4, 3)
     assert mock_cell.value == ""
     mock_sheet.update_cells.assert_called_once_with([mock_cell, ])
     assert mock_sheet.insert_row.call_count == len(fistful_of_datas)
@@ -181,7 +181,7 @@ def test_write_find_by_name(klass, mocker):
     k.driver.open.called_once_with("Test Name")
     mock_doc.worksheet.called_once_with("Sheet Name")
     mock_doc.add_worksheet.assert_not_called()
-    mock_sheet.resize.assert_called_once_with(1, 3)
+    mock_sheet.resize.assert_called_once_with(4, 3)
     assert mock_cell.value == ""
     mock_sheet.update_cells.assert_called_once_with([mock_cell, ])
     assert mock_sheet.insert_row.call_count == len(report.table)

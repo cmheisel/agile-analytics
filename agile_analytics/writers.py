@@ -20,7 +20,6 @@ class CSVWriter(object):
             writer.writerow(row)
 
 
-# TODO: Needs tests and docstrings
 class GSheetWriter(object):
     """Writes reports to Google Spreadsheets.
     Arguments:
@@ -97,7 +96,7 @@ class GSheetWriter(object):
         Returns:
             None
         """
-        self.clear_sheet(sheet, 1, len(data[0]))
+        self.clear_sheet(sheet, len(data), len(data[0]))
         self.append_to_sheet(sheet, data)
 
     def write(self, report, doc_name, sheet_name):
