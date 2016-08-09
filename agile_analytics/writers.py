@@ -28,6 +28,7 @@ class GSheetWriter(object):
 
     CREDENTIAL_CLASS = ServiceAccountCredentials
     DRIVER_MODULE = gspread
+    COLUMN_OPTIONS = 'A B C D E F G H I J K L M N O P Q R S T U V W X Y Z'.split(' ')
 
     def __init__(self, keyfile_name="client_secret.json"):
         self.keyfile_name = keyfile_name
@@ -75,20 +76,43 @@ class GSheetWriter(object):
             cell.value = ""
         sheet.update_cells(cell_list)
 
-    def append_to_sheet(self, sheet, data):
-        """Appends the supplied data to the worksheet.
+    def select_range(self, sheet, data):
+        """Returns the cells that will be modified to match the new data.
         Arguments:
-            sheet (Worksheet): The worksheet you want the data appended to.
-            data (array): The array of data you want appended to the sheet
+            sheet (Worksheet): The worksheet you want to put data into.
+            data (array): The array of data you want placed into the sheet.
+        Returns:
+            list[Cell]: The list of gspread.Cells that should be replaced to match the data.
+        """
+        start_cell = "A1"  # Always and forever
+        end_cell = "{}{}".format(
+            self.COLUMN_OPTIONS[len(data[0]) - 1],
+            len(data)
+        )
+        return sheet.range("{}:{}".format(start_cell, end_cell))
+
+    def update_cells(self, cells, data):
+        """Updates the cells, in batch, with the data provided.
+        Arguments:
+            cells (list[Cell]): The list of gspread.Cells that should be replaced to match the data.
+            data (array): The array of data you want placed into the sheet.
         Returns:
             None
         """
-        row_count = 1
-        for row in data:
-            sheet.insert_row(row, index=row_count)
-            row_count += 1
+        for i in range(0, len(cells)):
+            cell = cells[i]
+            row, col = cell.row, cell.col
+            row_index = row - 1
+            col_index = col - 1
+            try:
+                value = data[row_index][col_index]
+                cell.value = value
+            except IndexError:  # Leave as is, not in data
+                pass
 
-    def update_sheet(self, sheet, data):
+        return cells
+
+    def batch_update_sheet(self, sheet, data):
         """Clear a sheet and append the data to it.
         Arguments:
             sheet (Worksheet): The worksheet you want to modify
@@ -97,9 +121,11 @@ class GSheetWriter(object):
             None
         """
         self.clear_sheet(sheet, len(data), len(data[0]))
-        self.append_to_sheet(sheet, data)
+        cells = self.select_range(sheet, data)
+        cells = self.update_cells(cells, data)
+        sheet.update_cells(cells)
 
     def write(self, report, doc_name, sheet_name):
         doc = self.driver.open(doc_name)
         sheet = self.get_datasheet(doc, sheet_name)
-        self.update_sheet(sheet, report.table)
+        self.batch_update_sheet(sheet, report.table)
