@@ -380,9 +380,13 @@ class LeadTimePercentileReporter(Reporter):
             samples = []
             for sample_set in moving_sample:
                 samples.extend(sample_set)
-            the_50th = int(round(percentile(samples, 50)))
-            the_75th = int(round(percentile(samples, 75)))
-            the_95th = int(round(percentile(samples, 95)))
+
+            try:
+                the_50th = int(round(percentile(samples, 50)))
+                the_75th = int(round(percentile(samples, 75)))
+                the_95th = int(round(percentile(samples, 95)))
+            except IndexError:
+                the_50th, the_75th, the_95th = 0, 0, 0
 
             percentiles_by_week.append([sunday, the_50th, the_75th, the_95th])
 
