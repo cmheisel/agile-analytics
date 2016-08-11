@@ -122,3 +122,29 @@ def test_report_table_limit(klass, weeks_of_tickets, date, datetime, tzutc):
 
     assert len(report.table) == 5
     assert report.table == expected
+
+
+def test_report_table_no_tickets(klass, date, datetime, tzutc):
+    """Ensure the report table returns a row for every week"""
+
+    expected = [
+        ["Week", "50th", "75th", "95th"],
+        [date(2016, 5, 15), 0, 0, 0],
+        [date(2016, 5, 22), 0, 0, 0],
+        [date(2016, 5, 29), 0, 0, 0],
+        [date(2016, 6, 5), 0, 0, 0],
+        [date(2016, 6, 12), 0, 0, 0],
+        [date(2016, 6, 19), 0, 0, 0],
+        [date(2016, 6, 26), 0, 0, 0],
+    ]
+
+    r = klass(
+        title="Lead Time Percentile Report",
+        start_date=datetime(2016, 5, 15, 0, 0, 0, tzinfo=tzutc),  # Sunday
+        end_date=datetime(2016, 7, 2, 11, 59, 59, tzinfo=tzutc),  # Saturday
+        num_weeks=7,
+    )
+    report = r.report_on([])
+
+    assert len(report.table) == 8
+    assert report.table == expected
