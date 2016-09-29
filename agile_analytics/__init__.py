@@ -17,6 +17,7 @@ from .reporters import (
     LeadTimeDistributionReporter,
     TicketReporter,
     LeadTimePercentileReporter,
+    CycleTimePercentileReporter,
     SLAReporter,
     CreatedReporter,
 )
@@ -44,5 +45,6 @@ __all__ = [
     "LeadTimePercentileReporter",
     "SLAReporter",
     "PartialDateAnalyzer",
-    "CreatedReporter"
+    "CreatedReporter",
+    "CycleTimePercentileReporter"
 ]

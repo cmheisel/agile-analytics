@@ -402,6 +402,11 @@ class LeadTimePercentileReporter(TimePercentileReporter):
         super(LeadTimePercentileReporter, self).__init__(title, "lead_time", start_date=start_date, end_date=end_date, num_weeks=num_weeks)
 
 
+class CycleTimePercentileReporter(TimePercentileReporter):
+    def __init__(self, title, start_date=None, end_date=None, num_weeks=4):
+        super(CycleTimePercentileReporter, self).__init__(title, "cycle_time", start_date=start_date, end_date=end_date, num_weeks=num_weeks)
+
+
 class ThroughputReporter(Reporter):
     """Generate throughput reports.
 
