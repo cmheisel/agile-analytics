@@ -323,8 +323,8 @@ class LeadTimeDistributionReporter(Reporter):
         return r
 
 
-class LeadTimePercentileReporter(Reporter):
-    """Report on Lead Time Percentiles, calculated over a 4 week period.
+class TimePercentileReporter(Reporter):
+    """Report on Time Percentiles, calculated over a configurable (default 4) week period.
     Attributes:
         title (unicode): The name of the report
         start_date (datetime): The starting range of issues for the report.
@@ -332,9 +332,10 @@ class LeadTimePercentileReporter(Reporter):
         num_weeks (int): The number of weeks you'd like reported on. Default: 4
     """
 
-    def __init__(self, title, start_date=None, end_date=None, num_weeks=4):
+    def __init__(self, title, time_attr, start_date=None, end_date=None, num_weeks=4):
         super().__init__(title, start_date, end_date)
         self.num_weeks = num_weeks
+        self.time_attr = time_attr
 
     def valid_start_date(self, target_date):
         target_date = super().valid_start_date(target_date)
@@ -349,11 +350,11 @@ class LeadTimePercentileReporter(Reporter):
     def filter_issues(self, issues):
         return self.filter_on_ended(issues)
 
-    def _lead_times_for_week(self, week_start, issues):
+    def _times_for_week(self, week_start, issues):
         week_end = self.walk_forward_to_weekday(week_start, self.SATURDAY)
         week_start = datetime(week_start.year, week_start.month, week_start.day, 0, 0, 0, tzinfo=tzutc())
         week_end = datetime(week_end.year, week_end.month, week_end.day, 11, 59, 59, tzinfo=tzutc())
-        return [i.lead_time for i in issues if i.ended['entered_at'] >= week_start and i.ended['entered_at'] <= week_end]
+        return [getattr(i, self.time_attr) for i in issues if i.ended['entered_at'] >= week_start and i.ended['entered_at'] <= week_end]
 
     def report_on(self, issues):
         r = Report(
@@ -372,7 +373,7 @@ class LeadTimePercentileReporter(Reporter):
         percentiles_by_week = []
         moving_sample = []
         for sunday in self.starts_of_weeks():
-            moving_sample.append(self._lead_times_for_week(sunday, issues))
+            moving_sample.append(self._times_for_week(sunday, issues))
             # Lets limit our percentile calc to the past 4 weeks
             if len(moving_sample) > 4:
                 moving_sample.pop(0)
@@ -394,6 +395,16 @@ class LeadTimePercentileReporter(Reporter):
             r.table.append(row)
 
         return r
+
+
+class LeadTimePercentileReporter(TimePercentileReporter):
+    def __init__(self, title, start_date=None, end_date=None, num_weeks=4):
+        super(LeadTimePercentileReporter, self).__init__(title, "lead_time", start_date=start_date, end_date=end_date, num_weeks=num_weeks)
+
+
+class CycleTimePercentileReporter(TimePercentileReporter):
+    def __init__(self, title, start_date=None, end_date=None, num_weeks=4):
+        super(CycleTimePercentileReporter, self).__init__(title, "cycle_time", start_date=start_date, end_date=end_date, num_weeks=num_weeks)
 
 
 class ThroughputReporter(Reporter):
