@@ -126,7 +126,7 @@ class Reporter(object):
     def filter_issues(self, issues):
         raise NotImplementedError
 
-    def report_on(self, issues):
+    def report_on(self, issues, header=True):
         raise NotImplementedError
 
 
@@ -152,7 +152,7 @@ class CreatedReporter(Reporter):
         week_end = datetime(week_end.year, week_end.month, week_end.day, 11, 59, 59, tzinfo=tzutc())
         return [i for i in issues if i.committed['entered_at'] >= week_start and i.committed['entered_at'] <= week_end]
 
-    def report_on(self, issues):
+    def report_on(self, issues, header=True):
         """Generate a report, one row per week, with counts for each ticket type."""
         issues = self.filter_issues(issues)
         r = Report(
@@ -196,7 +196,7 @@ class TicketReporter(Reporter):
         """Ignore issues completed outside the start/end range."""
         return self.filter_on_ended(issues)
 
-    def report_on(self, issues):
+    def report_on(self, issues, header=True):
         """Generate a report, one row per issue, with details."""
         issues = self.filter_issues(issues)
         issues.sort(key=lambda x: x.ended['entered_at'])
@@ -250,7 +250,7 @@ class SLAReporter(Reporter):
         week_end = datetime(week_end.year, week_end.month, week_end.day, 11, 59, 59, tzinfo=tzutc())
         return [i for i in issues if i.ended['entered_at'] >= week_start and i.ended['entered_at'] <= week_end]
 
-    def report_on(self, issues, sla_config={}):
+    def report_on(self, issues, sla_config={}, header=True):
         r = Report(
             table=[],
             summary=dict(
@@ -294,7 +294,7 @@ class LeadTimeDistributionReporter(Reporter):
         """Ignore issues completed outside the start/end range."""
         return self.filter_on_ended(issues)
 
-    def report_on(self, issues):
+    def report_on(self, issues, header=True):
         """Generate a report object with a lead time histogram."""
         r = Report(
             table=[],
@@ -356,7 +356,7 @@ class TimePercentileReporter(Reporter):
         week_end = datetime(week_end.year, week_end.month, week_end.day, 11, 59, 59, tzinfo=tzutc())
         return [getattr(i, self.time_attr) for i in issues if i.ended['entered_at'] >= week_start and i.ended['entered_at'] <= week_end]
 
-    def report_on(self, issues):
+    def report_on(self, issues, header=True):
         r = Report(
             table=[],
             summary=dict(
@@ -365,8 +365,9 @@ class TimePercentileReporter(Reporter):
                 end_date=self.end_date,
                 num_weeks=self.num_weeks)
         )
-        headers = ["Week", "50th", "75th", "95th"]
-        r.table.append(headers)
+        if header:
+            headers = ["Week", "50th", "75th", "95th"]
+            r.table.append(headers)
 
         issues = self.filter_issues(issues)
 
@@ -449,7 +450,7 @@ class ThroughputReporter(Reporter):
     def filter_issues(self, issues):
         return self.filter_on_ended(issues)
 
-    def report_on(self, issues):
+    def report_on(self, issues, header=True):
         r = Report(
             table=[],
             summary=dict(
