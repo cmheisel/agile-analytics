@@ -101,6 +101,31 @@ def test_report_table(klass, weeks_of_tickets, date, datetime, tzutc):
     assert report.table == expected
 
 
+def test_report_table_no_header(klass, weeks_of_tickets, date, datetime, tzutc):
+    """Ensure the report table honors the header argument"""
+
+    expected = [
+        [date(2016, 5, 15), 28, 29, 29],
+        [date(2016, 5, 22), 26, 29, 29],
+        [date(2016, 5, 29), 24, 28, 29],
+        [date(2016, 6, 5), 22, 28, 29],
+        [date(2016, 6, 12), 13, 20, 23],
+        [date(2016, 6, 19), 8, 17, 22],
+        [date(2016, 6, 26), 8, 18, 22],
+    ]
+
+    r = klass(
+        title="Lead Time Percentile Report",
+        start_date=datetime(2016, 5, 15, 0, 0, 0, tzinfo=tzutc),  # Sunday
+        end_date=datetime(2016, 7, 2, 11, 59, 59, tzinfo=tzutc),  # Saturday
+        num_weeks=7,
+    )
+    report = r.report_on(weeks_of_tickets, header=False)
+
+    assert len(report.table) == 7
+    assert report.table == expected
+
+
 def test_report_table_limit(klass, weeks_of_tickets, date, datetime, tzutc):
     """Ensure the report table returns no more than the num_weeks provided"""
 
