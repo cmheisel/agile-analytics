@@ -81,12 +81,13 @@ def test_report_table(klass, AnalyzedAgileTicket, days_agos):
     issue_list.sort(key=lambda i: i.ended['entered_at'])
 
     expected = [
-        ["Key", "Lead Time", "Commit State", "Commit At", "Start State", "Start At", "End State", "End At"],
+        ["Key", "Lead Time", "Cycle Time", "Commit State", "Commit At", "Start State", "Start At", "End State", "End At"],
     ]
     for i in issue_list:
         row = [
             i.key,
             i.lead_time,
+            i.cycle_time,
             i.committed['state'],
             i.committed['entered_at'],
             i.started['state'],

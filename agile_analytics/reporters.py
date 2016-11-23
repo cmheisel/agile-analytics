@@ -210,12 +210,13 @@ class TicketReporter(Reporter):
         )
 
         r.table.append(
-            ["Key", "Lead Time", "Commit State", "Commit At", "Start State", "Start At", "End State", "End At"],
+            ["Key", "Lead Time", "Cycle Time", "Commit State", "Commit At", "Start State", "Start At", "End State", "End At"],
         )
         for i in issues:
             row = [
                 i.key,
                 i.lead_time,
+                i.cycle_time,
                 i.committed['state'],
                 i.committed['entered_at'],
                 i.started['state'],
