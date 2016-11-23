@@ -1,2 +1,2 @@
 __author__ = "cmheisel"
-__version__ = (0, 11)
+__version__ = (0, 12)
