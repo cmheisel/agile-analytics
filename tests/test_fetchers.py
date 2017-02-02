@@ -48,6 +48,7 @@ def jira_issue():
     return i
     """
     fields = stub(
+        summary="This is my summary",
         issuetype=stub(
             name="Story"
         ),
@@ -206,6 +207,19 @@ def test_converter_key(jira_issue, converter):
     """Ensure a converted issue has a key."""
     t = converter(jira_issue)
     assert t.key == u"FOO-1"
+
+
+def test_converter_summary(jira_issue, converter):
+    """Ensure a convereted issue has a title."""
+    t = converter(jira_issue)
+    assert t.title == u"This is my summary"
+
+
+def test_converter_summary_empty(jira_issue, converter):
+    """Ensure a convereted issue has a title."""
+    jira_issue.fields.summary = ''
+    t = converter(jira_issue)
+    assert t.title == u""
 
 
 def test_converter_created_at(jira_issue, converter, tz):
