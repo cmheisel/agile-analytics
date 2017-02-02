@@ -215,6 +215,7 @@ class TicketReporter(Reporter):
         for i in issues:
             row = [
                 i.key,
+                i.title,
                 i.lead_time,
                 i.cycle_time,
                 i.committed['state'],

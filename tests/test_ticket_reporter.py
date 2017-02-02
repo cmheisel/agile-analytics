@@ -86,6 +86,7 @@ def test_report_table(klass, AnalyzedAgileTicket, days_agos):
     for i in issue_list:
         row = [
             i.key,
+            i.title,
             i.lead_time,
             i.cycle_time,
             i.committed['state'],

@@ -42,6 +42,7 @@ def convert_jira_issue(issue):
 
     t = AgileTicket(issue.key, ttype=ttype)
 
+    t.title = issue.fields.summary
     t.created_at = parse(issue.fields.created)
     t.updated_at = parse(issue.fields.updated)
     t.flow_log.append(

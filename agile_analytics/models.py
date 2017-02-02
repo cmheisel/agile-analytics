@@ -10,15 +10,21 @@ class AgileTicket(object):
         key (unicode): Unique identifier for the ticket in its system of record
         created_at (datetime): When was the ticket created
         updated_at (datetime): When was the ticket last updated
+        type (str): The kind of ticket this is: Bug, Epic, Story, etc.
+
+    Optional Attributes:
+        title (unicode): The title of the ticket
+        type (unicode): A label of the type of ticket: Story, Epic, Defect
     """
 
-    def __init__(self, key, ttype="Ticket"):
+    def __init__(self, key, title="", ttype="Ticket"):
         """Init an AgileTicket.
 
         Args:
             key (str): A unique identifier for this ticket in the system of record
         """
         self.key = str(key)
+        self.title = title
         self.created_at = None
         self.updated_at = None
         self.type = ttype
@@ -81,15 +87,17 @@ class AnalyzedAgileTicket(object):
         ended (dict): The state and datetime when the story was ended
 
     Optional Attributes:
+        title (unicode): The title of the ticket
         type (unicode): A label of the type of ticket: Story, Epic, Defect
     """
 
     def __init__(
         self, key, committed, started, ended,
-        ttype="Ticket",
+        title="", ttype="Ticket",
     ):
         """Create AnalyzedAgileTickets."""
         self.key = key
+        self.title = title
         self.committed = committed
         self.started = started
         self.ended = ended
