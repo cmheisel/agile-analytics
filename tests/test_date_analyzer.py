@@ -172,3 +172,31 @@ def test_capturing_ticket_type(klass, Ticket, days_ago):
     results, ignored_issues = analyzer.analyze([t, ])
     at = results[0]
     assert at.type == "Story"
+
+
+def test_capturing_title(klass, Ticket, days_ago):
+    """The Ticket.type should be passed onto the analyzed ticket."""
+    analyzer = klass(
+        commit_states=[u"Selected", u"To Do", u"Created"],
+        start_states=[u"Dev In Progress", u"In Progress", ],
+        end_states=[u"Done", u"Accepted"],
+    )
+    test_flow_logs = [
+        dict(entered_at=days_ago(30), state="Created"),
+        dict(entered_at=days_ago(20), state="Selected"),
+        dict(entered_at=days_ago(11), state="In Progress"),
+        dict(entered_at=days_ago(10), state="Dev In Progress"),
+        dict(entered_at=days_ago(5), state="Accepted"),
+        dict(entered_at=days_ago(3), state="Done"),
+    ]
+    t = Ticket(
+        key="TEST-1",
+        title="This is my test title",
+        created_at=days_ago(15),
+        updated_at=days_ago(0),
+        flow_logs=test_flow_logs,
+        ttype="Story"
+    )
+    results, ignored_issues = analyzer.analyze([t, ])
+    at = results[0]
+    assert at.title == "This is my test title"
