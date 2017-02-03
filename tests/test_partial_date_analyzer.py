@@ -32,3 +32,18 @@ def test_created_ticket(Ticket, klass, days_ago, analyzer):
     results, ignored_issues = analyzer.analyze([t, ])
     assert results[0].committed['entered_at'] == days_ago(10)
     assert len(ignored_issues) == 0
+
+
+def test_created_ticket_title(Ticket, klass, days_ago, analyzer):
+    """Tickets title should be propogated"""
+    t = Ticket(
+        key="TEST-1",
+        title="Foo",
+        created_at=days_ago(10),
+        updated_at=days_ago(0),
+        flow_logs=[
+            dict(entered_at=days_ago(10), state="Created"),
+        ]
+    )
+    results, ignored_issues = analyzer.analyze([t, ])
+    assert results[0].title == "Foo"

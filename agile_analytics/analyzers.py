@@ -98,6 +98,7 @@ class PartialDateAnalyzer(object):
         kwargs = {
             "key": ticket.key,
             "ttype": ticket.type,
+            "title": ticket.title,
         }
 
         for phase, state_list in self.states_context.items():
@@ -148,6 +149,7 @@ class DateAnalyzer(PartialDateAnalyzer):
         kwargs = {
             "key": ticket.key,
             "ttype": ticket.type,
+            "title": ticket.title,
         }
 
         for phase, state_list in self.states_context.items():
