@@ -54,7 +54,7 @@ class PartialDateAnalyzer(object):
             u'ended': self.end_states,
         }
 
-    def _find_entered_at(self, state_list, ticket, dupe_strategy="oldest"):
+    def _find_entered_at(self, state_list, ticket):
         entry = dict(state=None, entered_at=None)
         entries = []
         for state_name in state_list:
@@ -65,10 +65,7 @@ class PartialDateAnalyzer(object):
                 break
 
         if len(entries) > 0:
-            if dupe_strategy == "oldest":
-                entry = entries[0]
-            else:
-                entry = entries[-1]
+            entry = entries[0]
         return entry['state'], entry['entered_at']
 
     def analyze(self, tickets):
@@ -102,10 +99,7 @@ class PartialDateAnalyzer(object):
         }
 
         for phase, state_list in self.states_context.items():
-            dupe_strategy = "oldest"
-            if phase == "ended":
-                dupe_strategy = "newest"
-            state, datetime = self._find_entered_at(state_list, ticket, dupe_strategy=dupe_strategy)
+            state, datetime = self._find_entered_at(state_list, ticket)
             kwargs[phase] = dict(state=state, entered_at=datetime)
         return AnalyzedAgileTicket(**kwargs)
 
@@ -153,10 +147,7 @@ class DateAnalyzer(PartialDateAnalyzer):
         }
 
         for phase, state_list in self.states_context.items():
-            dupe_strategy = "oldest"
-            if phase == "ended":
-                dupe_strategy = "newest"
-            state, datetime = self._find_entered_at(state_list, ticket, dupe_strategy=dupe_strategy)
+            state, datetime = self._find_entered_at(state_list, ticket)
             if None in (state, datetime):
                 msg = "{key} is missing flow_log information for {state_list}".format(key=ticket.key, state_list=state_list)
                 raise MissingPhaseInformation(

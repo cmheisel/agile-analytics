@@ -96,8 +96,8 @@ def test_pick_oldest_date(analyzer, Ticket, days_ago):
     assert results[0].started['entered_at'] == days_ago(9)
 
 
-def test_pick_newest_done(analyzer, Ticket, days_ago):
-    """Pick the newest entered_at from the ticket's history for done."""
+def test_pick_oldest_done(analyzer, Ticket, days_ago):
+    """Pick the oldest entered_at from the ticket's history for done."""
     test_flow_logs = [
         dict(entered_at=days_ago(10), state="Selected"),
         dict(entered_at=days_ago(9), state="In Progress"),
@@ -114,7 +114,7 @@ def test_pick_newest_done(analyzer, Ticket, days_ago):
         flow_logs=test_flow_logs
     )
     results, ignored_issues = analyzer.analyze([t, ])
-    assert results[0].ended['entered_at'] == days_ago(1)
+    assert results[0].ended['entered_at'] == days_ago(3)
 
 
 def test_pick_first_of_multiple_states(klass, Ticket, days_ago):
