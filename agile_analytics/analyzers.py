@@ -38,6 +38,9 @@ class PartialDateAnalyzer(object):
         start_state (list[str]): The list of names of the state when work was started.
         end_state (list[str]): The list of names of the state when work was completed.
     """
+    NEWEST_DATE = 'newest'
+    OLDEST_DATE = 'oldest'
+
     def __init__(self, commit_states, start_states, end_states):
         """Create instances."""
         self.end_states = end_states
@@ -54,7 +57,7 @@ class PartialDateAnalyzer(object):
             u'ended': self.end_states,
         }
 
-    def _find_entered_at(self, state_list, ticket):
+    def _find_entered_at(self, state_list, ticket, strategy):
         entry = dict(state=None, entered_at=None)
         entries = []
         for state_name in state_list:
@@ -65,33 +68,42 @@ class PartialDateAnalyzer(object):
                 break
 
         if len(entries) > 0:
-            entry = entries[0]
+            if strategy == self.NEWEST_DATE:
+                entry = entries[-1]
+            else:
+                entry = entries[0]
         return entry['state'], entry['entered_at']
 
-    def analyze(self, tickets):
+    def analyze(self, tickets, strategy=None):
         """Return a list of AnalyzedAgileTicket.
 
         Arguments:
             tickets (list[AgileTicket]): The list of tickets to be analyzed
+            strategy (analyzer.OLDEST_DATE | analyzer.NEWEST_DATE): Which date to pick when a ticket entered a state multiple times
 
         Returns:
             list[AnalyzedAgileTicket]: The list of tickets
         """
+        if strategy is None:
+            strategy = self.OLDEST_DATE
+
         analyzed_tickets = []
         ignored_tickets = []
         for ticket in tickets:
-            analyzed_tickets.append(self.analyze_ticket(ticket))
+            analyzed_tickets.append(self.analyze_ticket(ticket, strategy))
         return analyzed_tickets, ignored_tickets
 
-    def analyze_ticket(self, ticket):
+    def analyze_ticket(self, ticket, strategy):
         """Convert a single AgileTicket into an AnalyzedAgileTicket.
 
         Arguments:
             ticket (AgileTicket): The AgileTicket under consideration
+            strategy (analyzer.OLDEST_DATE | analyzer.NEWEST_DATE): Which date to pick when a ticket entered a state multiple times
 
         Returns:
             AnalyzedAgileTicket
         """
+
         kwargs = {
             "key": ticket.key,
             "ttype": ticket.type,
@@ -99,7 +111,7 @@ class PartialDateAnalyzer(object):
         }
 
         for phase, state_list in self.states_context.items():
-            state, datetime = self._find_entered_at(state_list, ticket)
+            state, datetime = self._find_entered_at(state_list, ticket, strategy)
             kwargs[phase] = dict(state=state, entered_at=datetime)
         return AnalyzedAgileTicket(**kwargs)
 
@@ -113,33 +125,39 @@ class DateAnalyzer(PartialDateAnalyzer):
         end_state (list[str]): The list of names of the state when work was completed.
     """
 
-    def analyze(self, tickets):
+    def analyze(self, tickets, strategy=None):
         """Return a list of AnalyzedAgileTicket.
 
         Arguments:
             tickets (list[AgileTicket]): The list of tickets to be analyzed
+            strategy (analyzer.OLDEST_DATE | analyzer.NEWEST_DATE): Which date to pick when a ticket entered a state multiple times
 
         Returns:
             list[AnalyzedAgileTicket]: The list of tickets
         """
+        if strategy is None:
+            strategy = self.OLDEST_DATE
+
         analyzed_tickets = []
         ignored_tickets = []
         for ticket in tickets:
             try:
-                analyzed_tickets.append(self.analyze_ticket(ticket))
+                analyzed_tickets.append(self.analyze_ticket(ticket, strategy))
             except MissingPhaseInformation as e:
                 ignored_tickets.append(dict(ticket=ticket, phase=e.phase, state_list=e.state_list))
         return analyzed_tickets, ignored_tickets
 
-    def analyze_ticket(self, ticket):
+    def analyze_ticket(self, ticket, strategy):
         """Convert a single AgileTicket into an AnalyzedAgileTicket.
 
         Arguments:
             ticket (AgileTicket): The AgileTicket under consideration
+            strategy (analyzer.OLDEST_DATE | analyzer.NEWEST_DATE): Which date to pick when a ticket entered a state multiple times
 
         Returns:
             AnalyzedAgileTicket
         """
+
         kwargs = {
             "key": ticket.key,
             "ttype": ticket.type,
@@ -147,7 +165,7 @@ class DateAnalyzer(PartialDateAnalyzer):
         }
 
         for phase, state_list in self.states_context.items():
-            state, datetime = self._find_entered_at(state_list, ticket)
+            state, datetime = self._find_entered_at(state_list, ticket, strategy)
             if None in (state, datetime):
                 msg = "{key} is missing flow_log information for {state_list}".format(key=ticket.key, state_list=state_list)
                 raise MissingPhaseInformation(
