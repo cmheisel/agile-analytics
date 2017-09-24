@@ -117,6 +117,26 @@ def test_pick_oldest_done(analyzer, Ticket, days_ago):
     assert results[0].ended['entered_at'] == days_ago(3)
 
 
+def test_pick_newest_date(analyzer, Ticket, days_ago):
+    """Pick the oldest entered_at from the ticket's history."""
+    test_flow_logs = [
+        dict(entered_at=days_ago(10), state="Selected"),
+        dict(entered_at=days_ago(9), state="In Progress"),
+        dict(entered_at=days_ago(8), state="Selected"),
+        dict(entered_at=days_ago(5), state="In Progress"),
+        dict(entered_at=days_ago(2), state="Done"),
+    ]
+    t = Ticket(
+        key="TEST-1",
+        created_at=days_ago(15),
+        updated_at=days_ago(0),
+        flow_logs=test_flow_logs
+    )
+    results, ignored_issues = analyzer.analyze([t, ], strategy=analyzer.NEWEST_DATE)
+    assert results[0].committed['entered_at'] == days_ago(8)
+    assert results[0].started['entered_at'] == days_ago(5)
+
+
 def test_pick_first_of_multiple_states(klass, Ticket, days_ago):
     """Pick the first state that matches, so folks can go specific > generic."""
     analyzer = klass(
