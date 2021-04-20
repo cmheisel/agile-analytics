@@ -13,7 +13,7 @@ python-dateutil==2.5.3
 #Testing
 flake8==2.6.0
 mccabe==0.5.0
-py==1.4.31
+py==1.10.0
 pycodestyle==2.0.0
 pyflakes==1.2.3
 pytest==2.9.2
