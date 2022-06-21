@@ -35,7 +35,7 @@ simplejson==3.8.2
 uritemplate==0.6
 
 #Mathyness
-numpy==1.11.1
+numpy==1.22.0
 
 # Docs
 pockets==0.3
